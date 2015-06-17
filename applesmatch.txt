@@ -4,7 +4,7 @@
 	"title"		"Apple TDM"
 	"version"	"1.03"
 	"workshopid"	"452370591"
-	"author_name"	"Dr./Mr. Apple"
+	"author_name"	"Dr. Apple"
 	"author_email"	"support@f4egaming.com"
 	"author_url"	"www.f4egaming.com"
 	"menusystem"	"1"
