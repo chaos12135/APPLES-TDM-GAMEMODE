@@ -4,6 +4,11 @@
 
 HAAB = 0
 PlayerPointsD = 0
+
+CLIENTHUD_RankName = "RANK_IS_LOADING"
+CLIENTHUD_RankNumber = "1337"
+CLIENTHUD_RankMaterial = "apple_ranks/test.png"
+
 --RewardSCreenT = 260
 --RewardScreen = 0
 --RewardScreenM = "materials/tdmhud/rank/test.png"
@@ -98,6 +103,31 @@ function TDMRoundedBoxHook3()
 end
 hook.Add("HUDPaint", "TDMRoundedBoxHook3", TDMRoundedBoxHook3)
 */
+ 
+function FetchRankandNum(data)
+	CLIENTHUD_RankName = data:ReadString()
+	CLIENTHUD_RankNumber = data:ReadString()
+	CLIENTHUD_RankMaterial = data:ReadString()
+	local ply = data:ReadEntity()
+	--data:ReadEntity():SetPData("AppleTDMRankName", RankName)
+	ply:SetPData("AppleTDMRankName", RankName)
+	ply:SetPData("AppleTDMRankNumber", RankNumber)
+	ply:SetPData("AppleTDMRankMaterial", RankMaterial)
+end
+usermessage.Hook("FetchRankandNum", FetchRankandNum)
+ 
+
+function TDMRoundedBoxHud2()
+ 	draw.RoundedBoxEx( 0, 10, 10, 200, 120, Color( 110,106,90,195 ), false, true, false, false )
+	draw.SimpleText( "Rank: "..CLIENTHUD_RankName, "MenuLarge2", 20, 16, COLOR_WHITE, TEXT_ALIGN_LEFT, TEXT_ALIGN_LEFT, 0 )
+	draw.SimpleText( "Level: "..CLIENTHUD_RankNumber, "MenuLarge2", 20, 30, COLOR_WHITE, TEXT_ALIGN_LEFT, TEXT_ALIGN_LEFT, 0 )
+	surface.SetDrawColor(255,255,255,255)
+	surface.SetMaterial( Material( CLIENTHUD_RankMaterial) )
+	surface.DrawTexturedRect( 90,35,75,75)
+	surface.SetTexture(0)
+end
+hook.Add("HUDPaint", "TDMRoundedBoxHud2", TDMRoundedBoxHud2)
+ 
  
 function TDMRoundedBoxHook()
 	draw.RoundedBoxEx( 0, 120, ScrH() - 85, 200, 80, Color( 110,106,90,195 ), false, true, false, false )

@@ -2,9 +2,9 @@
 
 if CLIENT then
 function f3_menu_apple(data)
-	--local ply = data:ReadEntity()
+	local ply = data:ReadEntity()
 
-	local MainMenuF3 = vgui.Create( "DFrame" ) -- The menu
+	MainMenuF3 = vgui.Create( "DFrame" ) -- The menu
 	MainMenuF3:SetSize(500, 300)
 	MainMenuF3:SetTitle( "Settings Menu" )
 	MainMenuF3:SetDraggable( false )
@@ -27,7 +27,7 @@ function f3_menu_apple(data)
 	DPanelListF3:EnableHorizontal( false )
 	DPanelListF3:EnableVerticalScrollbar( true )
 	
-	local DPanelListF32 = vgui.Create( "DPanelList" )
+	DPanelListF32 = vgui.Create( "DPanelList" )
 	DPanelListF32:SetPos( 0, 0 )
 	DPanelListF32:SetSize( MainMenuTabs:GetWide(), MainMenuTabs:GetTall() )
 	DPanelListF32:SetSpacing( 5 )
@@ -100,6 +100,120 @@ function f3_menu_apple(data)
 	GameShowSpawnsValueLabel:SetText("Show Spawn Points:")
 	GameShowSpawnsValueLabel:SizeToContents()
 	
+	local GameLevelUpPointsLabel = vgui.Create("DLabel", DPanelListF3 )
+	GameLevelUpPointsLabel:SetPos(2,168)
+	GameLevelUpPointsLabel:SetColor( Color( 0, 0, 0, 255 ) )
+	GameLevelUpPointsLabel:SetFont( "DebugFixed2" )
+	GameLevelUpPointsLabel:SetText("Points Rewarded on LevelUp:")
+	GameLevelUpPointsLabel:SizeToContents()
+	
+	local GameLevelUpPointsMultiplierLabel = vgui.Create("DLabel", DPanelListF3 )
+	GameLevelUpPointsMultiplierLabel:SetPos(68,181)
+	GameLevelUpPointsMultiplierLabel:SetColor( Color( 0, 0, 0, 255 ) )
+	GameLevelUpPointsMultiplierLabel:SetFont( "DebugFixed2" )
+	GameLevelUpPointsMultiplierLabel:SetText("Level Up Reward Multiplier:")
+	GameLevelUpPointsMultiplierLabel:SizeToContents()
+	
+	local GameLevelUpPointsSoundLabel = vgui.Create("DLabel", DPanelListF3 )
+	GameLevelUpPointsSoundLabel:SetPos(68,181+13)
+	GameLevelUpPointsSoundLabel:SetColor( Color( 0, 0, 0, 255 ) )
+	GameLevelUpPointsSoundLabel:SetFont( "DebugFixed2" )
+	GameLevelUpPointsSoundLabel:SetText("Level Up Sound:")
+	GameLevelUpPointsSoundLabel:SizeToContents()
+	
+	GameLevelUpPointsValue = vgui.Create( "DTextEntry", DPanelListF3 )
+	GameLevelUpPointsValue:SetPos( 20, 183 )
+	GameLevelUpPointsValue:SetSize(35, 20)
+	GameLevelUpPointsValue:SetText( "100" )
+	GameLevelUpPointsValue.OnChange = function( self )
+	local ReplaceToNumbers = string.gsub(GameLevelUpPointsValue:GetValue(),"%D", "")
+	local ReplaceToNumbers = string.gsub(ReplaceToNumbers,"%W", "")
+	-- MsgN(string.len(ReplaceToNumbers))
+	if string.len(ReplaceToNumbers) != 0 then
+		ReplaceToNumbersONLY = ReplaceToNumbers
+	else
+		ReplaceToNumbersONLY = "10"
+	end
+		net.Start( "f3_menu_apple_setting_reward_level" )
+			net.WriteString(ReplaceToNumbers)
+		net.SendToServer( ply )
+	end
+	
+	
+	local GameRewardSoundXValue = -0
+	local GameRewardSoundYValue = 105
+	/*
+	local GameRewardSoundValueLabel = vgui.Create("DLabel", DPanelListF3 )
+	GameRewardSoundValueLabel:SetPos(2,87+GameRewardSoundYValue)
+	GameRewardSoundValueLabel:SetColor( Color( 0, 0, 0, 255 ) )
+	GameRewardSoundValueLabel:SetFont( "DebugFixed2" )
+	GameRewardSoundValueLabel:SetText("Intro Song:")
+	GameRewardSoundValueLabel:SizeToContents()*/
+	
+	GameRewardSoundValue = vgui.Create( "DTextEntry", DPanelListF3 )
+	GameRewardSoundValue:SetPos( 32+GameRewardSoundXValue, 103+GameRewardSoundYValue )
+	GameRewardSoundValue:SetSize(172, 20)
+	GameRewardSoundValue:SetText( "http://google.com/test.mp3" )
+	GameRewardSoundValue.OnChange = function( self )
+		net.Start( "f3_menu_apple_setting_levelup_song" )
+			net.WriteString(GameRewardSoundValue:GetValue())
+		net.SendToServer( ply )
+	end
+	
+	GameRewardSoundTimeValue = vgui.Create( "DTextEntry", DPanelListF3 )
+	GameRewardSoundTimeValue:SetPos( 207+GameRewardSoundXValue, 103+GameRewardSoundYValue )
+	GameRewardSoundTimeValue:SetSize(25, 20)
+	GameRewardSoundTimeValue:SetText( "12" )
+	GameRewardSoundTimeValue.OnChange = function( self )
+	local ReplaceToNumbers = string.gsub(GameRewardSoundTimeValue:GetValue(),"%D", "")
+	local ReplaceToNumbers = string.gsub(ReplaceToNumbers,"%W", "")
+	-- MsgN(string.len(ReplaceToNumbers))
+	if string.len(ReplaceToNumbers) != 0 then
+		ReplaceToNumbersONLY = ReplaceToNumbers
+	else
+		ReplaceToNumbersONLY = "10"
+	end
+		net.Start( "f3_menu_apple_setting_levelup_song_time" )
+			net.WriteString(ReplaceToNumbers)
+		net.SendToServer( ply )
+	end
+	
+	RewardSoundPlay = vgui.Create( "DImageButton", DPanelListF3 )
+	RewardSoundPlay:SetPos( 237+GameRewardSoundXValue, 103+GameRewardSoundYValue )
+	RewardSoundPlay:SetSize( 20, 20 )
+	RewardSoundPlay:SetImage( "icon16/control_play.png" )
+	RewardSoundPlay:SetDisabled(false)
+	RewardSoundPlay.DoClick = function()
+	local url = GameRewardSoundValue:GetValue()
+		if LocalPlayer().gmod_apple_channel_test ~= nil && LocalPlayer().gmod_apple_channel_test:IsValid() then
+			LocalPlayer().gmod_apple_channel_test:Stop()
+		end
+	
+		sound.PlayURL(url,"",function(ch)
+			if ch != nil and ch:IsValid() then
+				ch:Play()
+				LocalPlayer().gmod_apple_channel_test = ch
+			end
+		end)
+	end
+	
+	
+	GameLevelUpPointsMultiplierValue = vgui.Create( "DCheckBox", DPanelListF3 )
+	GameLevelUpPointsMultiplierValue:SetPos( 205, 180 )
+	GameLevelUpPointsMultiplierValue:SetValue( 1 )
+	GameLevelUpPointsMultiplierValue:SetTooltip("So the reward is multiplied per level gained. (i.e. reward points set to 100, and you just get to level 12, you will unlock 1200 points instead of just 100)")
+	GameLevelUpPointsMultiplierValue.OnChange = function( self )
+	if GameLevelUpPointsMultiplierValue:GetChecked() == true then
+		net.Start( "f3_menu_apple_setting_reward_level_multi" )
+			net.WriteString(1)
+		net.SendToServer( ply )
+	else
+		net.Start( "f3_menu_apple_setting_reward_level_multi" )
+			net.WriteString(0)
+		net.SendToServer( ply )
+	end
+	end
+	
 	GameIntroSoundValue = vgui.Create( "DTextEntry", DPanelListF3 )
 	GameIntroSoundValue:SetPos( 32, 103 )
 	GameIntroSoundValue:SetSize(172, 20)
@@ -168,20 +282,6 @@ function f3_menu_apple(data)
 		end
 	end
 	
-	SettingsMapsOnFile = vgui.Create("DListView",DPanelListF3) -- Shows the team's weapons
-	SettingsMapsOnFile:SetPos(262, 15)
-	SettingsMapsOnFile:SetSize(175, 105)
-	SettingsMapsOnFile:SetMultiSelect(false)
-	SettingsMapsOnFile:AddColumn("ID"):SetFixedWidth(20)
-	SettingsMapsOnFile:AddColumn("Map Name")
-	
-	SettingsMapsOnPossible = vgui.Create("DListView",DPanelListF3) -- Shows the team's weapons
-	SettingsMapsOnPossible:SetPos(262, 140)
-	SettingsMapsOnPossible:SetSize(175, 85)
-	SettingsMapsOnPossible:SetMultiSelect(false)
-	SettingsMapsOnPossible:AddColumn("ID"):SetFixedWidth(20)
-	SettingsMapsOnPossible:AddColumn("Map Name")
-	
 	IntroSoundPlay = vgui.Create( "DImageButton", DPanelListF3 )
 	IntroSoundPlay:SetPos( 237, 103 )
 	IntroSoundPlay:SetSize( 20, 20 )
@@ -200,6 +300,20 @@ function f3_menu_apple(data)
 			end
 		end)
 	end
+	
+	SettingsMapsOnFile = vgui.Create("DListView",DPanelListF3) -- Shows the team's weapons
+	SettingsMapsOnFile:SetPos(262, 15)
+	SettingsMapsOnFile:SetSize(175, 105)
+	SettingsMapsOnFile:SetMultiSelect(false)
+	SettingsMapsOnFile:AddColumn("ID"):SetFixedWidth(20)
+	SettingsMapsOnFile:AddColumn("Map Name")
+	
+	SettingsMapsOnPossible = vgui.Create("DListView",DPanelListF3) -- Shows the team's weapons
+	SettingsMapsOnPossible:SetPos(262, 140)
+	SettingsMapsOnPossible:SetSize(175, 85)
+	SettingsMapsOnPossible:SetMultiSelect(false)
+	SettingsMapsOnPossible:AddColumn("ID"):SetFixedWidth(20)
+	SettingsMapsOnPossible:AddColumn("Map Name")
 	
 	local SettingsMapsOnFileLabel = vgui.Create("DLabel", DPanelListF3 )
 	SettingsMapsOnFileLabel:SetPos(267,0)
@@ -293,6 +407,8 @@ function f3_menu_apple(data)
 	MainMenuTabs:AddSheet( "Edit Ranks", DPanelListF32, "icon16/group.png", 
 	false, false, "Add, Delete, Edit teams" )
 	
+	RunRanksMenu(ply)
+	
 end
 usermessage.Hook("f3_menu_apple", f3_menu_apple)
 
@@ -321,6 +437,10 @@ local Intro = data:ReadString()
 local IntroChk = data:ReadString()
 local IntroTime = data:ReadString()
 local ShowSpawns = data:ReadString()
+local RewardLevel = data:ReadString()
+local RewardLevelMulti = data:ReadString()
+local RewardLevelSong = data:ReadString()
+local RewardLevelSongTime = data:ReadString()
 	if IsValid(GameEndingScoreValue) == true then
 		GameEndingScoreValue:SetText(Score)
 	end
@@ -359,8 +479,29 @@ local ShowSpawns = data:ReadString()
 			end
 		end
 	end
+	
 	if IsValid(GameIntroSoundTimeValue) == true then
 		GameIntroSoundTimeValue:SetText(IntroTime)
+	end
+
+	if IsValid(GameRewardSoundTimeValue) == true then
+		GameRewardSoundTimeValue:SetText(RewardLevelSongTime)
+	end
+
+	if IsValid(GameRewardSoundValue) == true then
+		GameRewardSoundValue:SetText(RewardLevelSong)
+	end
+
+	if IsValid(GameLevelUpPointsMultiplierValue) == true then
+		if RewardLevelMulti == "1" then
+			GameLevelUpPointsMultiplierValue:SetChecked(1)
+		else
+			GameLevelUpPointsMultiplierValue:SetChecked(0)
+		end
+	end
+	
+	if IsValid(GameLevelUpPointsValue) == true then
+		GameLevelUpPointsValue:SetText(RewardLevel)
 	end
 	
 	if IsValid(GameShowSpawns) == true then
@@ -433,6 +574,10 @@ function f3_menu_apple_fill_settings(ply)
 	local SettingInfoIntroCk = sql.QueryValue( "SELECT Value from apple_deathmatch_settings WHERE ID = '4';" )
 	local SettingInfoIntroTime = sql.QueryValue( "SELECT Value from apple_deathmatch_settings WHERE ID = '5';" )
 	local SettingsInfoShowSpawns = sql.QueryValue( "SELECT Value from apple_deathmatch_settings WHERE ID = '6';" )
+	local SettingsInfoRewardLevel = sql.QueryValue( "SELECT Value from apple_deathmatch_settings WHERE ID = '7';" )
+	local SettingsInfoRewardLevelMutli = sql.QueryValue( "SELECT Value from apple_deathmatch_settings WHERE ID = '8';" )
+	local SettingsInfoRewardLevelSong = sql.QueryValue( "SELECT Value from apple_deathmatch_settings WHERE ID = '9';" )
+	local SettingsInfoRewardLevelSongTime = sql.QueryValue( "SELECT Value from apple_deathmatch_settings WHERE ID = '10';" )
 	if SettingInfoScore == nil || SettingInfoTime == nil then return end
 	umsg.Start( "f3_menu_apple_fill_settings", ply )
 		umsg.String(SettingInfoScore)
@@ -441,6 +586,10 @@ function f3_menu_apple_fill_settings(ply)
 		umsg.String(SettingInfoIntroCk)
 		umsg.String(SettingInfoIntroTime)
 		umsg.String(SettingsInfoShowSpawns)
+		umsg.String(SettingsInfoRewardLevel)
+		umsg.String(SettingsInfoRewardLevelMutli)
+		umsg.String(SettingsInfoRewardLevelSong)
+		umsg.String(SettingsInfoRewardLevelSongTime)
 	umsg.End()
 end
 
@@ -504,6 +653,15 @@ net.Receive( "f3_menu_apple_setting_intro", function( len, ply )
 	sql.Query( "UPDATE apple_deathmatch_settings SET Value = '"..SongID.."' WHERE ID = '4' " )
 end)
 
+net.Receive( "f3_menu_apple_setting_levelup_song_time", function( len, ply )
+	local SongTime = net.ReadString()
+	sql.Query( "UPDATE apple_deathmatch_settings SET Value = '"..SongTime.."' WHERE ID = '10' " )
+end)
+
+net.Receive( "f3_menu_apple_setting_levelup_song", function( len, ply )
+	local SongName = net.ReadString()
+	sql.Query( "UPDATE apple_deathmatch_settings SET Value = "..sql.SQLStr(SongName).." WHERE ID = '9' " )
+end)
 
 net.Receive( "f3_menu_apple_setting_show_spawns", function( len, ply )
 	local ShowSpawns = net.ReadString()
@@ -511,12 +669,20 @@ net.Receive( "f3_menu_apple_setting_show_spawns", function( len, ply )
 	ReCreateSpawnItems()
 end)
 
-
 net.Receive( "f3_menu_apple_setting_intro_song_time", function( len, ply )
 	local SongIDTime = net.ReadString()
 	sql.Query( "UPDATE apple_deathmatch_settings SET Value = '"..SongIDTime.."' WHERE ID = '5' " )
 end)
 
+net.Receive( "f3_menu_apple_setting_reward_level", function( len, ply )
+	local ReWardLevel = net.ReadString()
+	sql.Query( "UPDATE apple_deathmatch_settings SET Value = '"..ReWardLevel.."' WHERE ID = '7' " )
+end)
+
+net.Receive( "f3_menu_apple_setting_reward_level_multi", function( len, ply )
+	local ReWardLevelMutli = net.ReadString()
+	sql.Query( "UPDATE apple_deathmatch_settings SET Value = '"..ReWardLevelMutli.."' WHERE ID = '8' " )
+end)
 
 net.Receive( "f3_menu_apple_setting_intro_song", function( len, ply )
 	local SongName = net.ReadString()
@@ -567,7 +733,11 @@ util.AddNetworkString( "f3_menu_apple_fill_settings" )
 util.AddNetworkString( "f3_menu_apple_setting_time" )
 util.AddNetworkString( "f3_menu_apple_setting_score" )
 util.AddNetworkString( "f3_menu_apple_fill_settings_maps_r" )
+util.AddNetworkString( "f3_menu_apple_setting_levelup_song_time" )
+util.AddNetworkString( "f3_menu_apple_setting_levelup_song" )
 util.AddNetworkString( "f3_menu_apple_setting_intro" )
+util.AddNetworkString( "f3_menu_apple_setting_reward_level" )
+util.AddNetworkString( "f3_menu_apple_setting_reward_level_multi" )
 util.AddNetworkString( "f3_menu_apple_setting_intro_song_time" )
 util.AddNetworkString( "f3_menu_apple_setting_show_spawns" )
 util.AddNetworkString( "f3_menu_apple_setting_intro_song" )

@@ -10,6 +10,7 @@
 -- Adding including files
 AddCSLuaFile( "cl_init.lua" )
 AddCSLuaFile( 'menu/soundmenu.lua' )
+AddCSLuaFile( 'menu/materialsmenu.lua' )
 AddCSLuaFile( 'menu/f1_menu.lua' )
 AddCSLuaFile( 'menu/f2_menu.lua' )
 AddCSLuaFile( 'menu/f3_menu.lua' )
@@ -56,6 +57,15 @@ function GM:PlayerInitialSpawn(ply)
 		ply:SetTeam(0)
 		timer.Simple( 0.5, function()
 			CheckGameTime(ply) -- This will see if there are any other players playing at the moment
+		end)
+		
+		timer.Simple( 1.5, function()
+			umsg.Start( "FetchRankandNum", ply )
+				umsg.String(sql.QueryValue( "SELECT Rank FROM apple_deathmatch_player WHERE SteamID = '"..tostring(ply:UniqueID()).."';" ))
+				umsg.String(sql.QueryValue( "SELECT RankNum FROM apple_deathmatch_player WHERE SteamID = '"..tostring(ply:UniqueID()).."';" ))
+				umsg.String(sql.QueryValue( "SELECT RankMat FROM apple_deathmatch_player WHERE SteamID = '"..tostring(ply:UniqueID()).."';" ))
+				umsg.Entity(ply)
+			umsg.End()
 		end)
 			
 	for k, v in pairs(player.GetAll()) do -- Get a list of all players playing
@@ -385,7 +395,7 @@ end
 function CheckPlayerDatabase( ply )
 	local PlayerInfo = sql.QueryValue( "SELECT cont from apple_deathmatch_player WHERE SteamID = '"..tostring(ply:UniqueID()).."';" )
 	if PlayerInfo == nil then
-		sql.Query( "INSERT INTO apple_deathmatch_player ( `SteamID`, `PlayerName`, `Kills`, `Deaths`, `Score`, `LifeScore`, `Ratio`, `RankNum`, `Rank`, `dsc`, `time`, `cont` ) VALUES ( '"..tostring(ply:UniqueID()).."', "..tostring(sql.SQLStr(ply:Nick()))..", '0', '0', '0', '0', '0', '0', 'Newb', '0', '0', '1' )" )
+		sql.Query( "INSERT INTO apple_deathmatch_player ( `SteamID`, `PlayerName`, `Kills`, `Deaths`, `Score`, `LifeScore`, `Ratio`, `RankNum`, `Rank`, `RankMat`, `dsc`, `time`, `cont` ) VALUES ( '"..tostring(ply:UniqueID()).."', "..tostring(sql.SQLStr(ply:Nick()))..", '0', '0', '0', '0', '0', '0', 'Newb', 'apple_ranks/1.png', '0', '0', '1' )" )
 		-- MsgN(ply:Nick().. " was added to the players database.")
 		if sql.LastError() != nil then
 			 -- MsgN("init.lua: "..sql.LastError())
@@ -412,7 +422,7 @@ end
 
 -- Check to see if the players table exists
 if sql.TableExists( "apple_deathmatch_player" ) == false then
-	sql.Query( "CREATE TABLE apple_deathmatch_player ( SteamID varchar(255), PlayerName varchar(255), Kills int, Deaths int, Score int, LifeScore int, Ratio float, RankNum int, Rank varchar(255), dsc int, time int, cont int )" )
+	sql.Query( "CREATE TABLE apple_deathmatch_player ( SteamID varchar(255), PlayerName varchar(255), Kills int, Deaths int, Score int, LifeScore int, Ratio float, RankNum int, Rank varchar(255), RankMat varchar(255), dsc int, time int, cont int )" )
 	-- MsgN("Creating table for players")
 	if sql.LastError() != nil then
 		 -- MsgN("init.lua: "..sql.LastError())
@@ -487,6 +497,43 @@ local AttackerInfo = sql.Query( "SELECT * from apple_deathmatch_player WHERE Ste
 		if sql.LastError() != nil then
 			 -- MsgN("init.lua: "..sql.LastError())
 		end
+		
+		local CheckRankNowN = sql.QueryValue( "SELECT Kills FROM apple_deathmatch_player WHERE SteamID = '"..tostring(attacker:UniqueID()).."'" )
+		local CheckRankNowID = sql.QueryValue( "SELECT ID FROM apple_deathmatch_ranks WHERE Req = '"..CheckRankNowN.."'" )
+		if CheckRankNowID != nil then
+				local CheckSettingSeven = sql.QueryValue( "SELECT Value FROM apple_deathmatch_settings WHERE ID = '7'" )
+				local CheckSettingEight = sql.QueryValue( "SELECT Value FROM apple_deathmatch_settings WHERE ID = '8'" )
+				local CheckSettingNine = sql.QueryValue( "SELECT Value FROM apple_deathmatch_settings WHERE ID = '9'" )
+				local CheckSettingTen = sql.QueryValue( "SELECT Value FROM apple_deathmatch_settings WHERE ID = '10'" )
+				
+				umsg.Start( "AppleRankUpSoundEffect", attacker )
+					umsg.String(CheckSettingNine)
+					umsg.String(CheckSettingTen)
+					umsg.Entity(attacker)
+				umsg.End()
+				
+				if CheckSettingEight == "1" then
+					ScoreEarnedFromLevelUp = (tonumber(CheckRankNowID) * tonumber(CheckSettingSeven))
+				elseif CheckSettingEight == "0" then
+					ScoreEarnedFromLevelUp = tonumber(CheckSettingSeven)
+				end
+				
+				local AttackerScore = AttackerScore + ScoreEarnedFromLevelUp
+				
+				sql.Query( "UPDATE apple_deathmatch_player SET Score = '"..AttackerScore.."' WHERE SteamID = '"..tostring(attacker:UniqueID()).."'" )
+		
+			local CheckRankNowRN = sql.QueryValue( "SELECT RankName FROM apple_deathmatch_ranks WHERE ID = '"..CheckRankNowID.."'" )
+			local CheckRankNowRM = sql.QueryValue( "SELECT Material FROM apple_deathmatch_ranks WHERE ID = '"..CheckRankNowID.."'" )
+			umsg.Start( "FetchRankandNum", attacker )
+				umsg.String(CheckRankNowRN)
+				umsg.String(CheckRankNowID)
+				umsg.String(CheckRankNowRM)
+				umsg.Entity(attacker)
+			umsg.End()
+			sql.Query( "UPDATE apple_deathmatch_player SET Rank = "..(sql.SQLStr(CheckRankNowRN))..", RankNum = '"..CheckRankNowID.."', RankMat = "..(sql.SQLStr(CheckRankNowRM)).." WHERE SteamID = '"..tostring(attacker:UniqueID()).."'" )
+		end
+		
+		
 		local GetTotalKillsForTeam = sql.QueryValue( "SELECT Kills from apple_deathmatch_team WHERE ID = "..tonumber(attacker:Team())..";" )
 		local GetTotalKillsForTeam3 = sql.QueryValue( "SELECT Score from apple_deathmatch_team WHERE ID = "..tonumber(attacker:Team())..";" )
 		local GetTotalKillsForTeam2 = sql.QueryValue( "SELECT Deaths from apple_deathmatch_team WHERE ID = "..tonumber(victim:Team())..";" )

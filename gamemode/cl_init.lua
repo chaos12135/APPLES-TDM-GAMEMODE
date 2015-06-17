@@ -11,6 +11,7 @@
 -- Adding including files
 include( 'shared.lua' )
 include( 'menu/soundmenu.lua' )
+include( 'menu/materialsmenu.lua' )
 include( 'menu/f1_menu.lua' )
 include( 'menu/f2_menu.lua' )
 include( 'menu/f3_menu.lua' )
@@ -120,6 +121,28 @@ surface.PlaySound( "apples_tdm_gm/wedding.mp3" )
 end
 usermessage.Hook("AppleCountDownStartSound", AppleCountDownStartSound)
 
+
+function AppleRankUpSoundEffect(data)
+	local url = data:ReadString()
+	local time = data:ReadString()
+	timer.Simple(tonumber(time), function()
+		if LocalPlayer().gmod_apple_channel ~= nil && LocalPlayer().gmod_apple_channel:IsValid() then
+			LocalPlayer().gmod_apple_channel:Stop()
+		end
+	end)
+	if LocalPlayer().gmod_apple_channel ~= nil && LocalPlayer().gmod_apple_channel:IsValid() then
+		LocalPlayer().gmod_apple_channel:Stop()
+	end
+	
+	sound.PlayURL(url,"",function(ch)
+		if ch != nil and ch:IsValid() then
+			ch:Play()
+			LocalPlayer().gmod_apple_channel = ch
+		end
+	end)
+end
+usermessage.Hook("AppleRankUpSoundEffect", AppleRankUpSoundEffect)
+
 function APPLE_GM_HUD()
 	if AmIAllowedToDisplaySpectator == 1 then
 		draw.RoundedBoxEx( 0, 25, 25, 700, 35, Color(0,0,0,255), false, true, false, false )
@@ -128,15 +151,15 @@ function APPLE_GM_HUD()
 	if TheLobbyAppleTimeID == 1 then
 	local TheTimeQ = TheLobbyAppleTime - math.Round(CurTime())
 		if TheTimeQ >= 0 then
-			draw.RoundedBoxEx( 0, 25, 75, 260, 35, Color(0,0,0,255), false, true, false, false )
-			draw.SimpleText( "Lobby Timer: "..TheTimeQ, "TDM_Mini", 45, 75, Color(255,255,255,255), TEXT_ALIGN_LEFT, TEXT_ALIGN_LEFT, 0 )
+			draw.RoundedBoxEx( 0, 25, 145, 260, 35, Color(0,0,0,255), false, true, false, false )
+			draw.SimpleText( "Lobby Timer: "..TheTimeQ, "TDM_Mini", 45, 145, Color(255,255,255,255), TEXT_ALIGN_LEFT, TEXT_ALIGN_LEFT, 0 )
 		end
 	end
 	if TheGameAppleTimeID == 1 then
 	local TheTimeQ = TheGameAppleTime - math.Round(CurTime())
 		if TheTimeQ >= 0 then
-			draw.RoundedBoxEx( 0, 25, 75, 260, 35, Color(0,0,0,255), false, true, false, false )
-			draw.SimpleText( "Game Timer: "..TheTimeQ, "TDM_Mini", 45, 75, Color(255,255,255,255), TEXT_ALIGN_LEFT, TEXT_ALIGN_LEFT, 0 )
+			draw.RoundedBoxEx( 0, 25, 145, 260, 35, Color(0,0,0,255), false, true, false, false )
+			draw.SimpleText( "Game Timer: "..TheTimeQ, "TDM_Mini", 45, 145, Color(255,255,255,255), TEXT_ALIGN_LEFT, TEXT_ALIGN_LEFT, 0 )
 		end
 	end
 	if YouAreTheMVP == 1 then

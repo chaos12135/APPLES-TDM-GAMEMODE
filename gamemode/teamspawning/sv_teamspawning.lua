@@ -86,6 +86,7 @@ function GM:PlayerSpawn(ply)
 if THEGAMEISOVERDONOTFIREANYMORE == 1 then 
 	
 return end
+
 	if ply:Team() < 1000 && ply:Team() > 0 then
 	ply:StripWeapons()
 	ply:StripAmmo()
