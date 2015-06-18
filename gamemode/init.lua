@@ -15,6 +15,8 @@ AddCSLuaFile( 'menu/f1_menu.lua' )
 AddCSLuaFile( 'menu/f2_menu.lua' )
 AddCSLuaFile( 'menu/f3_menu.lua' )
 AddCSLuaFile( 'menu/f3_menu_ranks.lua' )
+AddCSLuaFile( 'menu/f3_menu_classes.lua' )
+AddCSLuaFile( 'menu/f3_menu_shop.lua' )
 AddCSLuaFile( 'menu/f4_menu.lua' )
 AddCSLuaFile( 'menu/cl_adci_teams.lua' )
 AddCSLuaFile( 'hud/cl_apple_hud.lua' )
@@ -27,6 +29,8 @@ include( 'menu/f1_menu.lua' )
 include( 'menu/f2_menu.lua' )
 include( 'menu/f3_menu.lua' )
 include( 'menu/f3_menu_ranks.lua' )
+include( 'menu/f3_menu_classes.lua' )
+include( 'menu/f3_menu_shop.lua' )
 include( 'menu/f4_menu.lua' )
 include( 'hud/sv_apple_hud.lua' )
 include( 'teamspawning/sv_teamspawning.lua' )
@@ -61,9 +65,9 @@ function GM:PlayerInitialSpawn(ply)
 		
 		timer.Simple( 1.5, function()
 			umsg.Start( "FetchRankandNum", ply )
-				umsg.String(sql.QueryValue( "SELECT Rank FROM apple_deathmatch_player WHERE SteamID = '"..tostring(ply:UniqueID()).."';" ))
-				umsg.String(sql.QueryValue( "SELECT RankNum FROM apple_deathmatch_player WHERE SteamID = '"..tostring(ply:UniqueID()).."';" ))
-				umsg.String(sql.QueryValue( "SELECT RankMat FROM apple_deathmatch_player WHERE SteamID = '"..tostring(ply:UniqueID()).."';" ))
+				umsg.String(sql.QueryValue( "SELECT Rank FROM apple_deathmatch_player_103 WHERE SteamID = '"..tostring(ply:UniqueID()).."';" ))
+				umsg.String(sql.QueryValue( "SELECT RankNum FROM apple_deathmatch_player_103 WHERE SteamID = '"..tostring(ply:UniqueID()).."';" ))
+				umsg.String(sql.QueryValue( "SELECT RankMat FROM apple_deathmatch_player_103 WHERE SteamID = '"..tostring(ply:UniqueID()).."';" ))
 				umsg.Entity(ply)
 			umsg.End()
 		end)
@@ -200,8 +204,8 @@ function GM:PlayerDisconnected( ply )
 
 	if ply:GetMoveType() == 2 then -- Because we don't like people who leave during matches, we mark those who leave during the matches.
 	-- I don't think I'm going to make a punishment system for those who leave, I'll just leave that up to whoever even cares about that.
-		local GetTotalDisconnections = tonumber(sql.QueryValue( "SELECT dsc from apple_deathmatch_player WHERE SteamID = '"..tostring(ply:UniqueID()).."';" ))
-		sql.Query( "UPDATE apple_deathmatch_player SET dsc = '"..(GetTotalDisconnections+1).."' WHERE SteamID = '"..tostring(ply:UniqueID()).."'" )
+		local GetTotalDisconnections = tonumber(sql.QueryValue( "SELECT dsc from apple_deathmatch_player_103 WHERE SteamID = '"..tostring(ply:UniqueID()).."';" ))
+		sql.Query( "UPDATE apple_deathmatch_player_103 SET dsc = '"..(GetTotalDisconnections+1).."' WHERE SteamID = '"..tostring(ply:UniqueID()).."'" )
 		if sql.LastError() != nil then
 			 -- MsgN("init.lua: "..sql.LastError())
 		end
@@ -393,15 +397,15 @@ end
 
 -- Checks to see if the player exists in the database | I wouldn't mess with this, just saying
 function CheckPlayerDatabase( ply )
-	local PlayerInfo = sql.QueryValue( "SELECT cont from apple_deathmatch_player WHERE SteamID = '"..tostring(ply:UniqueID()).."';" )
+	local PlayerInfo = sql.QueryValue( "SELECT cont from apple_deathmatch_player_103 WHERE SteamID = '"..tostring(ply:UniqueID()).."';" )
 	if PlayerInfo == nil then
-		sql.Query( "INSERT INTO apple_deathmatch_player ( `SteamID`, `PlayerName`, `Kills`, `Deaths`, `Score`, `LifeScore`, `Ratio`, `RankNum`, `Rank`, `RankMat`, `dsc`, `time`, `cont` ) VALUES ( '"..tostring(ply:UniqueID()).."', "..tostring(sql.SQLStr(ply:Nick()))..", '0', '0', '0', '0', '0', '0', 'Newb', 'apple_ranks/1.png', '0', '0', '1' )" )
+		sql.Query( "INSERT INTO apple_deathmatch_player_103 ( `SteamID`, `PlayerName`, `Kills`, `Deaths`, `Score`, `LifeScore`, `Ratio`, `RankNum`, `Rank`, `RankMat`, `dsc`, `time`, `cont` ) VALUES ( '"..tostring(ply:UniqueID()).."', "..tostring(sql.SQLStr(ply:Nick()))..", '0', '0', '0', '0', '0', '0', 'Newb', 'apple_ranks/1.png', '0', '0', '1' )" )
 		-- MsgN(ply:Nick().. " was added to the players database.")
 		if sql.LastError() != nil then
 			 -- MsgN("init.lua: "..sql.LastError())
 		end
 	else
-		sql.Query( "UPDATE apple_deathmatch_player SET cont = '"..(PlayerInfo+1).."' WHERE SteamID = '"..tostring(ply:UniqueID()).."'" )
+		sql.Query( "UPDATE apple_deathmatch_player_103 SET cont = '"..(PlayerInfo+1).."' WHERE SteamID = '"..tostring(ply:UniqueID()).."'" )
 		if sql.LastError() != nil then
 			 -- MsgN("init.lua: "..sql.LastError())
 		end
@@ -415,14 +419,14 @@ function CheckPlayerDatabase( ply )
 		end
 	end
 	umsg.Start( "HUD_GET_POINTS", ply ) -- Because I can't seem to find a way to get weapons names without going to client, I send info to client and get it back
-		umsg.Short(sql.QueryValue( "SELECT Score FROM apple_deathmatch_player WHERE SteamID = '"..tostring(ply:UniqueID()).."';" ))
+		umsg.Short(sql.QueryValue( "SELECT Score FROM apple_deathmatch_player_103 WHERE SteamID = '"..tostring(ply:UniqueID()).."';" ))
 	umsg.End()
 end
 
 
 -- Check to see if the players table exists
-if sql.TableExists( "apple_deathmatch_player" ) == false then
-	sql.Query( "CREATE TABLE apple_deathmatch_player ( SteamID varchar(255), PlayerName varchar(255), Kills int, Deaths int, Score int, LifeScore int, Ratio float, RankNum int, Rank varchar(255), RankMat varchar(255), dsc int, time int, cont int )" )
+if sql.TableExists( "apple_deathmatch_player_103" ) == false then
+	sql.Query( "CREATE TABLE apple_deathmatch_player_103 ( SteamID varchar(255), PlayerName varchar(255), Kills int, Deaths int, Score int, LifeScore int, Ratio float, RankNum int, Rank varchar(255), RankMat varchar(255), dsc int, time int, cont int )" )
 	-- MsgN("Creating table for players")
 	if sql.LastError() != nil then
 		 -- MsgN("init.lua: "..sql.LastError())
@@ -450,14 +454,14 @@ end
 -- Adds score to players who kill
 function GM:PlayerDeath( victim, weapon, attacker )
 if IsValid(attacker) == false || attacker:IsValid() == false then return end
-local VictimInfo = sql.Query( "SELECT * from apple_deathmatch_player WHERE SteamID = '"..tostring(victim:UniqueID()).."';" ) -- Gets Victims Informations
+local VictimInfo = sql.Query( "SELECT * from apple_deathmatch_player_103 WHERE SteamID = '"..tostring(victim:UniqueID()).."';" ) -- Gets Victims Informations
 	for k, v in pairs(VictimInfo) do
 		VictimKills = tonumber(v['Kills'])
 		VictimDeaths = tonumber(v['Deaths'])
 		VictimScore = tonumber(v['Score'])
 	--	VictimRatio = tonumber(v['Ratio']) -- I don't really need this, but I'll just keep it commented out.
 	end
-local AttackerInfo = sql.Query( "SELECT * from apple_deathmatch_player WHERE SteamID = '"..tostring(attacker:UniqueID()).."';" ) -- Gets the Attackers Informations
+local AttackerInfo = sql.Query( "SELECT * from apple_deathmatch_player_103 WHERE SteamID = '"..tostring(attacker:UniqueID()).."';" ) -- Gets the Attackers Informations
 	for k, v in pairs(AttackerInfo) do
 		AttackerKills = tonumber(v['Kills'])
 		AttackerDeaths = tonumber(v['Deaths'])
@@ -469,7 +473,7 @@ local AttackerInfo = sql.Query( "SELECT * from apple_deathmatch_player WHERE Ste
 		local VictimDeaths = VictimDeaths + 1
 		local VictimScore = VictimScore - 10
 		local VictimRatio = VictimKills/VictimDeaths
-		sql.Query( "UPDATE apple_deathmatch_player SET Deaths = '"..VictimDeaths.."', Score = '"..VictimScore.."', Ratio = '"..VictimRatio.."' WHERE SteamID = '"..tostring(victim:UniqueID()).."'" )
+		sql.Query( "UPDATE apple_deathmatch_player_103 SET Deaths = '"..VictimDeaths.."', Score = '"..VictimScore.."', Ratio = '"..VictimRatio.."' WHERE SteamID = '"..tostring(victim:UniqueID()).."'" )
 		if sql.LastError() != nil then
 			 -- MsgN("init.lua: "..sql.LastError())
 		end
@@ -477,7 +481,7 @@ local AttackerInfo = sql.Query( "SELECT * from apple_deathmatch_player WHERE Ste
 	
 	if attacker:Team() == victim:Team() then -- Are players on the same team?
 		local AttackerScore = AttackerScore - 10
-		sql.Query( "UPDATE apple_deathmatch_player SET Score = '"..AttackerScore.."' WHERE SteamID = '"..tostring(attacker:UniqueID()).."'" )
+		sql.Query( "UPDATE apple_deathmatch_player_103 SET Score = '"..AttackerScore.."' WHERE SteamID = '"..tostring(attacker:UniqueID()).."'" )
 		if sql.LastError() != nil then
 			 -- MsgN("init.lua: "..sql.LastError())
 		end		
@@ -489,16 +493,16 @@ local AttackerInfo = sql.Query( "SELECT * from apple_deathmatch_player WHERE Ste
 		local VictimDeaths = VictimDeaths + 1
 		local AttackerRatio = AttackerKills/AttackerDeaths
 		local VictimRatio = VictimKills/VictimDeaths
-		sql.Query( "UPDATE apple_deathmatch_player SET Score = '"..AttackerScore.."', Kills = '"..AttackerKills.."', Ratio = '"..AttackerRatio.."' WHERE SteamID = '"..tostring(attacker:UniqueID()).."'" )
+		sql.Query( "UPDATE apple_deathmatch_player_103 SET Score = '"..AttackerScore.."', Kills = '"..AttackerKills.."', Ratio = '"..AttackerRatio.."' WHERE SteamID = '"..tostring(attacker:UniqueID()).."'" )
 		if sql.LastError() != nil then
 			 -- MsgN("init.lua: "..sql.LastError())
 		end
-		sql.Query( "UPDATE apple_deathmatch_player SET Deaths = '"..VictimDeaths.."', Ratio = '"..VictimRatio.."' WHERE SteamID = '"..tostring(victim:UniqueID()).."'" )
+		sql.Query( "UPDATE apple_deathmatch_player_103 SET Deaths = '"..VictimDeaths.."', Ratio = '"..VictimRatio.."' WHERE SteamID = '"..tostring(victim:UniqueID()).."'" )
 		if sql.LastError() != nil then
 			 -- MsgN("init.lua: "..sql.LastError())
 		end
 		
-		local CheckRankNowN = sql.QueryValue( "SELECT Kills FROM apple_deathmatch_player WHERE SteamID = '"..tostring(attacker:UniqueID()).."'" )
+		local CheckRankNowN = sql.QueryValue( "SELECT Kills FROM apple_deathmatch_player_103 WHERE SteamID = '"..tostring(attacker:UniqueID()).."'" )
 		local CheckRankNowID = sql.QueryValue( "SELECT ID FROM apple_deathmatch_ranks WHERE Req = '"..CheckRankNowN.."'" )
 		if CheckRankNowID != nil then
 				local CheckSettingSeven = sql.QueryValue( "SELECT Value FROM apple_deathmatch_settings WHERE ID = '7'" )
@@ -520,7 +524,7 @@ local AttackerInfo = sql.Query( "SELECT * from apple_deathmatch_player WHERE Ste
 				
 				local AttackerScore = AttackerScore + ScoreEarnedFromLevelUp
 				
-				sql.Query( "UPDATE apple_deathmatch_player SET Score = '"..AttackerScore.."' WHERE SteamID = '"..tostring(attacker:UniqueID()).."'" )
+				sql.Query( "UPDATE apple_deathmatch_player_103 SET Score = '"..AttackerScore.."' WHERE SteamID = '"..tostring(attacker:UniqueID()).."'" )
 		
 			local CheckRankNowRN = sql.QueryValue( "SELECT RankName FROM apple_deathmatch_ranks WHERE ID = '"..CheckRankNowID.."'" )
 			local CheckRankNowRM = sql.QueryValue( "SELECT Material FROM apple_deathmatch_ranks WHERE ID = '"..CheckRankNowID.."'" )
@@ -530,7 +534,7 @@ local AttackerInfo = sql.Query( "SELECT * from apple_deathmatch_player WHERE Ste
 				umsg.String(CheckRankNowRM)
 				umsg.Entity(attacker)
 			umsg.End()
-			sql.Query( "UPDATE apple_deathmatch_player SET Rank = "..(sql.SQLStr(CheckRankNowRN))..", RankNum = '"..CheckRankNowID.."', RankMat = "..(sql.SQLStr(CheckRankNowRM)).." WHERE SteamID = '"..tostring(attacker:UniqueID()).."'" )
+			sql.Query( "UPDATE apple_deathmatch_player_103 SET Rank = "..(sql.SQLStr(CheckRankNowRN))..", RankNum = '"..CheckRankNowID.."', RankMat = "..(sql.SQLStr(CheckRankNowRM)).." WHERE SteamID = '"..tostring(attacker:UniqueID()).."'" )
 		end
 		
 		
@@ -548,7 +552,7 @@ local AttackerInfo = sql.Query( "SELECT * from apple_deathmatch_player WHERE Ste
 		team.SetScore(attacker:Team(), tonumber(GetTotalKillsForTeam3+10))
 		
 		umsg.Start( "HUD_GET_POINTS", attacker ) -- Because I can't seem to find a way to get weapons names without going to client, I send info to client and get it back
-			umsg.Short(tonumber(sql.QueryValue( "SELECT Score FROM apple_deathmatch_player WHERE SteamID = '"..tostring(attacker:UniqueID()).."';" )))
+			umsg.Short(tonumber(sql.QueryValue( "SELECT Score FROM apple_deathmatch_player_103 WHERE SteamID = '"..tostring(attacker:UniqueID()).."';" )))
 		umsg.End()
 		
 		local CheckScoreCount = sql.QueryValue( "SELECT Kills from apple_deathmatch_team WHERE ID = '"..tostring(attacker:Team()).."';" )
@@ -670,8 +674,8 @@ function CheckMVP(attacker)
 		end
 		SpectateMVP(p)
 		if p == nil then return end
-		local WhatsScore = sql.QueryValue( "SELECT Score FROM apple_deathmatch_player WHERE SteamID = '"..tostring(p:UniqueID()).."';" )
-		sql.Query( "UPDATE apple_deathmatch_player SET Score = "..(WhatsScore+50).." WHERE SteamID = '"..tostring(p:UniqueID()).."';" )
+		local WhatsScore = sql.QueryValue( "SELECT Score FROM apple_deathmatch_player_103 WHERE SteamID = '"..tostring(p:UniqueID()).."';" )
+		sql.Query( "UPDATE apple_deathmatch_player_103 SET Score = "..(WhatsScore+50).." WHERE SteamID = '"..tostring(p:UniqueID()).."';" )
 	end
 end
 

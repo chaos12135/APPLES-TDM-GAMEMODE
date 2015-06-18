@@ -232,7 +232,7 @@ end
 
 if SERVER then
 	function GM:ShowHelp( ply ) -- This hook is called every time F1 is pressed.
-	local PlayerInfo = sql.Query( "SELECT * from apple_deathmatch_player WHERE SteamID = '"..tostring(ply:UniqueID()).."';" )
+	local PlayerInfo = sql.Query( "SELECT * from apple_deathmatch_player_103 WHERE SteamID = '"..tostring(ply:UniqueID()).."';" )
 	if PlayerInfo == nil then return end
 	for k, v in pairs(PlayerInfo) do
 		f1_PlayerKills = v['Kills']

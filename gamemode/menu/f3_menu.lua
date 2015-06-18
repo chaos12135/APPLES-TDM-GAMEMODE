@@ -34,8 +34,19 @@ function f3_menu_apple(data)
 	DPanelListF32:EnableHorizontal( false )
 	DPanelListF32:EnableVerticalScrollbar( true )
 	
+	DPanelListF33 = vgui.Create( "DPanelList" )
+	DPanelListF33:SetPos( 0, 0 )
+	DPanelListF33:SetSize( MainMenuTabs:GetWide(), MainMenuTabs:GetTall() )
+	DPanelListF33:SetSpacing( 5 )
+	DPanelListF33:EnableHorizontal( false )
+	DPanelListF33:EnableVerticalScrollbar( true )
 	
-	
+	DPanelListF34 = vgui.Create( "DPanelList" )
+	DPanelListF34:SetPos( 0, 0 )
+	DPanelListF34:SetSize( MainMenuTabs:GetWide(), MainMenuTabs:GetTall() )
+	DPanelListF34:SetSpacing( 5 )
+	DPanelListF34:EnableHorizontal( false )
+	DPanelListF34:EnableVerticalScrollbar( true )
 	
 	GameEndingScoreValue = vgui.Create( "DTextEntry", DPanelListF3 )
 	GameEndingScoreValue:SetPos( 20, 20 )
@@ -403,11 +414,17 @@ function f3_menu_apple(data)
 
 	
 	MainMenuTabs:AddSheet( "General Settings", DPanelListF3, "icon16/controller.png", 
-	false, false, "General team information" )
+	false, false, "General settings information" )
 	MainMenuTabs:AddSheet( "Edit Ranks", DPanelListF32, "icon16/group.png", 
-	false, false, "Add, Delete, Edit teams" )
+	false, false, "Add, Delete, Edit Ranks" )
+	MainMenuTabs:AddSheet( "Classes", DPanelListF33, "icon16/bricks.png", 
+	false, false, "Add, Delete, Edit, Classes" )
+	MainMenuTabs:AddSheet( "Pointshop", DPanelListF34, "icon16/cart.png", 
+	false, false, "Add, Delete, Edit, Pointshop" )
 	
 	RunRanksMenu(ply)
+	RunClassesMenu(ply)
+	RunPointShopMenu(ply)
 	
 end
 usermessage.Hook("f3_menu_apple", f3_menu_apple)

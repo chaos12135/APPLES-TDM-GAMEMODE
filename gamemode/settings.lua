@@ -17,16 +17,39 @@ function CreateSettingsDB()
 		if sql.LastError() != nil then
 			 -- MsgN("settings.lua: "..sql.LastError())
 		end
-		sql.Query( "INSERT INTO apple_deathmatch_settings ( `ID`, `Type`, `Value`) VALUES ( '1', 'Score', '50')" )
-		sql.Query( "INSERT INTO apple_deathmatch_settings ( `ID`, `Type`, `Value`) VALUES ( '2', 'Time', '5')" )
-		sql.Query( "INSERT INTO apple_deathmatch_settings ( `ID`, `Type`, `Value`) VALUES ( '3', 'Intro', "..sql.SQLStr('https://ia601508.us.archive.org/35/items/njoin2/njoin2.mp3')..")" )
-		sql.Query( "INSERT INTO apple_deathmatch_settings ( `ID`, `Type`, `Value`) VALUES ( '4', 'IntroChk', '1')" )
-		sql.Query( "INSERT INTO apple_deathmatch_settings ( `ID`, `Type`, `Value`) VALUES ( '5', 'IntroTime', '25')" )
-		sql.Query( "INSERT INTO apple_deathmatch_settings ( `ID`, `Type`, `Value`) VALUES ( '6', 'ShowSpawns', '1')" )
-		sql.Query( "INSERT INTO apple_deathmatch_settings ( `ID`, `Type`, `Value`) VALUES ( '7', 'RewardLevel', '100')" )
-		sql.Query( "INSERT INTO apple_deathmatch_settings ( `ID`, `Type`, `Value`) VALUES ( '8', 'RewardLevelMutli', '1')" )
-		sql.Query( "INSERT INTO apple_deathmatch_settings ( `ID`, `Type`, `Value`) VALUES ( '9', 'RewardLevelSound', "..sql.SQLStr('https://ia601506.us.archive.org/17/items/levelup_201506/levelup.mp3')..")" )
-		sql.Query( "INSERT INTO apple_deathmatch_settings ( `ID`, `Type`, `Value`) VALUES ( '10', 'RewardLevelSoundTime', '12')" )
+		if sql.QueryValue( "SELECT ID FROM apple_deathmatch_settings WHERE ID = '1';" ) == nil then
+			sql.Query( "INSERT INTO apple_deathmatch_settings ( `ID`, `Type`, `Value`) VALUES ( '1', 'Score', '50')" )
+		end
+		if sql.QueryValue( "SELECT ID FROM apple_deathmatch_settings WHERE ID = '2';" ) == nil then
+			sql.Query( "INSERT INTO apple_deathmatch_settings ( `ID`, `Type`, `Value`) VALUES ( '2', 'Time', '5')" )
+		end
+		if sql.QueryValue( "SELECT ID FROM apple_deathmatch_settings WHERE ID = '3';" ) == nil then
+			sql.Query( "INSERT INTO apple_deathmatch_settings ( `ID`, `Type`, `Value`) VALUES ( '3', 'Intro', "..sql.SQLStr('https://ia601508.us.archive.org/35/items/njoin2/njoin2.mp3')..")" )
+		end
+		if sql.QueryValue( "SELECT ID FROM apple_deathmatch_settings WHERE ID = '4';" ) == nil then
+			sql.Query( "INSERT INTO apple_deathmatch_settings ( `ID`, `Type`, `Value`) VALUES ( '4', 'IntroChk', '1')" )
+		end
+		if sql.QueryValue( "SELECT ID FROM apple_deathmatch_settings WHERE ID = '5';" ) == nil then
+			sql.Query( "INSERT INTO apple_deathmatch_settings ( `ID`, `Type`, `Value`) VALUES ( '5', 'IntroTime', '25')" )
+		end
+		if sql.QueryValue( "SELECT ID FROM apple_deathmatch_settings WHERE ID = '6';" ) == nil then
+			sql.Query( "INSERT INTO apple_deathmatch_settings ( `ID`, `Type`, `Value`) VALUES ( '6', 'ShowSpawns', '1')" )
+		end
+		if sql.QueryValue( "SELECT ID FROM apple_deathmatch_settings WHERE ID = '7';" ) == nil then
+			sql.Query( "INSERT INTO apple_deathmatch_settings ( `ID`, `Type`, `Value`) VALUES ( '7', 'RewardLevel', '100')" )
+		end
+		if sql.QueryValue( "SELECT ID FROM apple_deathmatch_settings WHERE ID = '8';" ) == nil then
+			sql.Query( "INSERT INTO apple_deathmatch_settings ( `ID`, `Type`, `Value`) VALUES ( '8', 'RewardLevelMutli', '1')" )
+		end
+		if sql.QueryValue( "SELECT ID FROM apple_deathmatch_settings WHERE ID = '9';" ) == nil then
+			sql.Query( "INSERT INTO apple_deathmatch_settings ( `ID`, `Type`, `Value`) VALUES ( '9', 'RewardLevelSound', "..sql.SQLStr('https://ia601506.us.archive.org/17/items/levelup_201506/levelup.mp3')..")" )
+		end
+		if sql.QueryValue( "SELECT ID FROM apple_deathmatch_settings WHERE ID = '10';" ) == nil then
+			sql.Query( "INSERT INTO apple_deathmatch_settings ( `ID`, `Type`, `Value`) VALUES ( '10', 'RewardLevelSoundTime', '12')" )
+		end
+		if sql.QueryValue( "SELECT ID FROM apple_deathmatch_settings WHERE ID = '11';" ) == nil then
+			sql.Query( "INSERT INTO apple_deathmatch_settings ( `ID`, `Type`, `Value`) VALUES ( '11', 'Classes', '0')" )
+		end
 		-- MsgN("Creating setting : Score")
 		if sql.LastError() != nil then
 			 -- MsgN("settings.lua: "..sql.LastError())
