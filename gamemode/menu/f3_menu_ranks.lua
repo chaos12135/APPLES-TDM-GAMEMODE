@@ -360,6 +360,7 @@ end
 
 
 
+
 if SERVER then
 
 
@@ -422,8 +423,7 @@ end)
 
 
 function CreateRanksDB()
-	local GENERICA_RANKS = sql.QueryValue( "SELECT ID FROM apple_deathmatch_ranks WHERE ID = '1';" ) -- Gets just the ranks name for this
-	if GENERICA_RANKS == nil then
+	if sql.TableExists( "apple_deathmatch_ranks" ) == false then
 		sql.Query( "CREATE TABLE apple_deathmatch_ranks ( ID int, RankName varchar(255), Req int, Material varchar(255))" )
 		sql.Query( "INSERT INTO apple_deathmatch_ranks ( `ID`, `RankName`, `Req`, `Material`) VALUES ( '1', 'Private', '5', 'apple_ranks/1.png')" )
 		sql.Query( "INSERT INTO apple_deathmatch_ranks ( `ID`, `RankName`, `Req`, `Material`) VALUES ( '2', 'Private First Class', '10', 'apple_ranks/2.png')" )
@@ -463,8 +463,9 @@ function CreateRanksDB()
 		resource.AddSingleFile( "materials/apple_ranks/18.png" )
 		resource.AddSingleFile( "materials/apple_ranks/test.png" )
 	else
-		local GENERICA_RANKSM = sql.Query( "SELECT * FROM apple_deathmatch_ranks;" )
-		for k, v in pairs(GENERICA_RANKSM) do
+		local GENERICA_RANKSM102 = sql.Query( "SELECT * FROM apple_deathmatch_ranks;" )
+		if GENERICA_RANKSM102 == nil then return end
+		for k, v in pairs(GENERICA_RANKSM102) do
 			resource.AddSingleFile( "materials/"..v['Material'] )
 		end
 	end
