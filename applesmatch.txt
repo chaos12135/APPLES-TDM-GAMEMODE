@@ -1,7 +1,7 @@
 "tdm"
 {
 	"base"		"base"
-	"title"		"Apple TDM"
+	"title"		"Apple TDM 1.06"
 	"version"	"1.06"
 	"workshopid"	"452370591"
 	"author_name"	"Dr./Mr. Apple"
