@@ -18,6 +18,7 @@ AddCSLuaFile( 'menu/f3_menu_ranks.lua' )
 AddCSLuaFile( 'menu/f3_menu_classes.lua' )
 AddCSLuaFile( 'menu/f3_menu_shop.lua' )
 AddCSLuaFile( 'menu/f4_menu.lua' )
+AddCSLuaFile( 'menu/classes_menu.lua' )
 AddCSLuaFile( 'menu/cl_adci_teams.lua' )
 AddCSLuaFile( 'hud/cl_apple_hud.lua' )
 AddCSLuaFile( 'hud/cl_apple_hud_fonts.lua' )
@@ -32,6 +33,7 @@ include( 'menu/f3_menu_ranks.lua' )
 include( 'menu/f3_menu_classes.lua' )
 include( 'menu/f3_menu_shop.lua' )
 include( 'menu/f4_menu.lua' )
+include( 'menu/classes_menu.lua' )
 include( 'hud/sv_apple_hud.lua' )
 include( 'teamspawning/sv_teamspawning.lua' )
 include( 'teamweapons/sv_teamweapons.lua' )
@@ -244,6 +246,18 @@ function GM:PlayerDisconnected( ply )
 end
 
 
+
+function ClassesSystemActivated( ply )
+if tonumber(sql.QueryValue( "SELECT ID FROM apple_deathmatch_settings WHERE ID = '11';" )) == 0 then return end
+	timer.Simple(3, function()
+		umsg.Start( "Classes_System_Menu", ply )
+		--	umsg.Entity(ply)
+		umsg.End()
+	end)
+end
+
+
+
 function PlaceMeOnTheLowestTeamAvaialable( ply ) -- Find the lowest team available, hopefully Garry' fully fixed this
 	ply:SetTeam(team.BestAutoJoinTeam())
 	---- MsgN(team.GetName(ply:Team()).."("..ply:Team()..")")
@@ -304,15 +318,18 @@ local CheckGameTimeTeamInfo = sql.QueryValue( "SELECT COUNT(ID) from apple_death
 	if PlayerCounterAll <= 1 then -- Checks to see if no players are on, then just place the first guy on a random team
 		GAMEMODE:PlayerSpawnAsSpectator( ply )
 		ply:SetTeam(math.random( 1, CheckGameTimeTeamInfo )) -- Just find a random team to be apart of
+		ClassesSystemActivated( ply )
 	elseif PlayerCounterAll == 2 then -- If one person is on, and you're going to be the second person, then place you on another team other than the first guy
 		GAMEMODE:PlayerSpawnAsSpectator( ply )
 		PlaceSecondPlayerOnTeam(ply)
+		ClassesSystemActivated( ply )
 	elseif GlobalizationStartTimerForGamemodeApple == 1 then -- The game has started, so place spectator mode, and find a player to spectate
 		GAMEMODE:PlayerSpawnAsSpectator( ply )
 		YouChooseMeToSpectate(ply) -- This chooses a players to spectate, and also makes sure it's not the player himself
 	else
 		GAMEMODE:PlayerSpawnAsSpectator( ply ) -- This is for if the game hasn't started, and there are more than two players
 		PlaceMeOnTheLowestTeamAvaialable( ply ) -- This places the person on the next following team with the lowest number of people on it
+		ClassesSystemActivated( ply )
 	end
 
 end

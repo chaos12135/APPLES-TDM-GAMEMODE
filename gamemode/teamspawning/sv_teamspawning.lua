@@ -127,6 +127,20 @@ return end
 			ply:Give(v['Name'])
 		end
 		
+		local WhatIsItClass = sql.QueryValue( "SELECT Value FROM apple_deathmatch_settings WHERE ID = '11';" )
+		if tonumber(WhatIsItClass) == 1 then
+			if ply:GetPData("AppleTDMGmodClass") != nil then
+				local NewClassName_sv_Classweapons = string.gsub((ply:GetPData("AppleTDMGmodClass")), " ", "_")
+				local NewClassName_sv_Classweapons = sql.SQLStr("apple_deathmatch_classes_"..NewClassName_sv_Classweapons)
+				local NewClassName_sv_Classweapons = string.gsub(NewClassName_sv_Classweapons, "'", "") 
+				local AllClassesW = sql.Query( "SELECT * FROM "..NewClassName_sv_Classweapons..";" )
+				if AllClassesW == nil then return end
+					for k, v in pairs(AllClassesW) do
+						ply:Give(v['Name'])
+					end
+			end
+		end
+		
 		local NewTeamName_sv_teammodels = string.gsub(team.GetName(ply:Team()), " ", "_")
 		local NewTeamName_sv_teammodels = sql.SQLStr("apple_deathmatch_teammodels_"..NewTeamName_sv_teammodels)
 		local NewTeamName_sv_teammodels = string.gsub(NewTeamName_sv_teammodels, "'", "")
