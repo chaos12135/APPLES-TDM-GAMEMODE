@@ -14,9 +14,7 @@ function CreateSettingsDB()
 	if GENERICA_SETTINGS == nil then return end
 	if sql.TableExists("apple_deathmatch_settings") == false then
 		sql.Query( "CREATE TABLE apple_deathmatch_settings ( ID int, Type varchar(255), Value varchar(255) )" )
-		if sql.LastError() != nil then
-			 -- MsgN("settings.lua: "..sql.LastError())
-		end
+	end
 		if sql.QueryValue( "SELECT ID FROM apple_deathmatch_settings WHERE ID = '1';" ) == nil then
 			sql.Query( "INSERT INTO apple_deathmatch_settings ( `ID`, `Type`, `Value`) VALUES ( '1', 'Score', '50')" )
 		end
@@ -50,11 +48,6 @@ function CreateSettingsDB()
 		if sql.QueryValue( "SELECT ID FROM apple_deathmatch_settings WHERE ID = '11';" ) == nil then
 			sql.Query( "INSERT INTO apple_deathmatch_settings ( `ID`, `Type`, `Value`) VALUES ( '11', 'Classes', '0')" )
 		end
-		-- MsgN("Creating setting : Score")
-		if sql.LastError() != nil then
-			 -- MsgN("settings.lua: "..sql.LastError())
-		end
-	end
 end
 
 
