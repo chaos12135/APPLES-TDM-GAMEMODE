@@ -248,12 +248,13 @@ end
 
 
 function ClassesSystemActivated( ply )
-if tonumber(sql.QueryValue( "SELECT ID FROM apple_deathmatch_settings WHERE ID = '11';" )) == 0 then return end
-	timer.Simple(3, function()
-		umsg.Start( "Classes_System_Menu", ply )
-		--	umsg.Entity(ply)
-		umsg.End()
-	end)
+	if tonumber(sql.QueryValue( "SELECT Value FROM apple_deathmatch_settings WHERE ID = '11';" )) == 1 then
+		timer.Simple(3, function()
+			umsg.Start( "Classes_System_Menu", ply )
+			--	umsg.Entity(ply)
+			umsg.End()
+		end)
+	end
 end
 
 
