@@ -56,7 +56,7 @@ if CLIENT then
 		ClassSubmitButton:SetText( "GO!" )
 		ClassSubmitButton:SetSize( 35, 25 )
 		ClassSubmitButton.DoClick = function()
-		if WhatClassAmISelecting2 == nil then
+		if WhatClassAmISelecting == nil then
 			Derma_Message("Something has gone terribly wrong. Please select the class again!", "ERROR", "OK")
 		return end
 			net.Start( "f3_menu_apple_edit_class_submit_go" )
