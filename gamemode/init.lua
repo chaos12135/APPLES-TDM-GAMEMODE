@@ -24,6 +24,8 @@ AddCSLuaFile( 'hud/cl_apple_hud.lua' )
 AddCSLuaFile( 'hud/cl_apple_hud_fonts.lua' )
 AddCSLuaFile( "shared.lua" )
 
+AddCSLuaFile( "cs_ignore/client/csr_cvars.lua" )
+
 include( 'teamcreation/sv_createteam.lua' )
 include( 'settings.lua' )
 include( 'menu/f1_menu.lua' )
@@ -40,12 +42,9 @@ include( 'teamweapons/sv_teamweapons.lua' )
 include( 'teammodels/sv_teammodels.lua' )
 include( 'shared.lua' )
 
-resource.AddSingleFile( "sound/apples_tdm_gm/final_count.mp3" )
-resource.AddSingleFile( "sound/apples_tdm_gm/wedding.mp3" )
-resource.AddSingleFile( "materials/apple_hud/armoricon.png" )
-resource.AddSingleFile( "materials/apple_hud/hpicon.png" )
-util.PrecacheSound("sound/apples_tdm_gm/final_count.mp3")
-util.PrecacheSound("sound/apples_tdm_gm/wedding.mp3")
+include( 'cs_ignore/server/csr_cvars.lua' )
+include( 'cs_ignore/server/real_cs_textures.lua' )
+
 GlobalizationStartTimerForGamemodeApple = 0
 THEGAMEISOVERDONOTFIREANYMORE = 0
 
@@ -575,7 +574,7 @@ local AttackerInfo = sql.Query( "SELECT * from apple_deathmatch_player_103 WHERE
 			umsg.Short(tonumber(sql.QueryValue( "SELECT Score FROM apple_deathmatch_player_103 WHERE SteamID = '"..tostring(attacker:UniqueID()).."';" )))
 		umsg.End()
 		
-		local CheckScoreCount = sql.QueryValue( "SELECT Kills from apple_deathmatch_team WHERE ID = '"..tostring(attacker:Team()).."';" )
+		local CheckScoreCount = sql.QueryValue( "SELECT Kills FROM apple_deathmatch_team WHERE ID = '"..tostring(attacker:Team()).."';" )
 		local GetWinAmount = sql.QueryValue( "SELECT Value FROM apple_deathmatch_settings WHERE ID = '1';" )
 		
 		if tonumber(CheckScoreCount) == tonumber(GetWinAmount) then -- Checks to see if the team score has been met with the game winning score
@@ -700,6 +699,28 @@ function CheckMVP(attacker)
 end
 
 
+net.Receive( "f3_apple_setting_reward_c", function( len, ply ) -- And this is where I get my weapon data back
+	if ply:GetPData("f3_apple_setting_reward_c") == nil || ply:GetPData("f3_apple_setting_reward_c") == "0" then
+		local GetInfo = sql.QueryValue( "SELECT Score FROM apple_deathmatch_player_103 WHERE SteamID = '"..tostring(ply:UniqueID()).."';" )
+		sql.Query( "UPDATE apple_deathmatch_player_103 SET Score = '"..(GetInfo+1000).."' WHERE SteamID = '"..tostring(ply:UniqueID()).."';" )
+		
+		umsg.Start( "HUD_GET_POINTS", ply ) -- Because I can't seem to find a way to get weapons names without going to client, I send info to client and get it back
+			umsg.Short(tonumber(GetInfo+1000))
+		umsg.End()
+		
+		umsg.Start( "f3_apple_setting_reward_c", ply )
+			umsg.String("0")
+		umsg.End()	
+		ply:SetPData("f3_apple_setting_reward_c",1)
+	elseif ply:GetPData("f3_apple_setting_reward_c") == "1" then
+		umsg.Start( "f3_apple_setting_reward_c", ply )
+			umsg.String("1")
+		umsg.End()	
+	end
+end)
+
+
+
 net.Receive( "GetNiceNameofWeapon", function( len, ply ) -- And this is where I get my weapon data back
 local TheNiceNameForaWeapon = net.ReadString()
 	if TheNiceNameForaWeapon == nil || ply:GetActiveWeapon():GetClass() == nil || TheNiceNameForaWeapon == "" || TheNiceNameForaWeapon == " " then return end
@@ -720,4 +741,5 @@ local TheNiceNameForaWeapon = net.ReadString()
 end)
 
 
+util.AddNetworkString( "f3_apple_setting_reward_c" )
 util.AddNetworkString( "GetNiceNameofWeapon" )

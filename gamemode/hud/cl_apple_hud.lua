@@ -1,6 +1,6 @@
 -- This HUD is very messy and picky. Try
 -- not to edit it as it may break core functions
--- of the game. 
+-- of the game.
 
 HAAB = 0
 PlayerPointsD = 0

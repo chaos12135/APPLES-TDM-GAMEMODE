@@ -217,12 +217,17 @@ if CLIENT then
 		PlayerFavGunInfoColour:SizeToContents()
 		
 		-- Picutre of Favorite Weapon
-		PlayerFavGunInfoPic = vgui.Create( "DModelPanel", MainMenu )
-		PlayerFavGunInfoPic:SetModel( FavGunNamePicture )
-		PlayerFavGunInfoPic:SetPos( -150, PlayerInfos + 10 )
-		PlayerFavGunInfoPic:SetSize( 450, 450 )
-		PlayerFavGunInfoPic:SetCamPos( Vector( 0, 55, 25 ) )
-		PlayerFavGunInfoPic:SetLookAt( Vector( 05, 0, 0 ) )
+		if FavGunNamePicture != nil then
+			PlayerFavGunInfoPic = vgui.Create( "DModelPanel", MainMenu )
+			PlayerFavGunInfoPic:SetModel( FavGunNamePicture )
+			PlayerFavGunInfoPic:SetPos( -150, PlayerInfos + 10 )
+			PlayerFavGunInfoPic:SetSize( 450, 450 )
+			PlayerFavGunInfoPic:SetCamPos( Vector( 0, 55, 25 ) )
+			PlayerFavGunInfoPic:SetLookAt( Vector( 05, 0, 0 ) )
+		else
+			PlayerFavGunInfoColour:SetText( FavGunNiceName.." ("..FavGunKills..") {WEAPON HAS BEEN REMOVED FROM THE SERVER!}" )
+			PlayerFavGunInfoColour:SizeToContents()
+		end
 		
 	end
 	usermessage.Hook("f1_menu_apple", f1_menu_apple)

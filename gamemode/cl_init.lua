@@ -23,6 +23,7 @@ include( 'menu/classes_menu.lua' )
 include( 'menu/cl_adci_teams.lua' )
 include( 'hud/cl_apple_hud.lua' )
 include( 'hud/cl_apple_hud_fonts.lua' )
+include( "cs_ignore/client/csr_cvars.lua" )
 AmIAllowedToDisplaySpectator = 0
 TheLobbyAppleTime = 0
 TheLobbyAppleTimeID = 0
@@ -31,6 +32,13 @@ NextMapNameID = 0
 RestartServerPleaseNowID = 0
 YouAreNotTheMVPID = 0
 TheGameAppleTimeID = 0
+	local KEY1_CLASSES_CLIENT = 0
+	local KEY2_CLASSES_CLIENT = 0
+	local KEY3_CLASSES_CLIENT = 0
+	local KEY4_CLASSES_CLIENT = 0
+	local KEY5_CLASSES_CLIENT = 0
+	local KEY6_CLASSES_CLIENT = 0
+	local KEY7_CLASSES_CLIENT = (1)
 
 function GetNiceNameofWeapon(data) -- This is to get the weapon name for the favorite weapons table
 local WeaponName = data:ReadEntity()
@@ -44,6 +52,93 @@ local PlayerName = data:ReadEntity()
 	net.SendToServer( PlayerName )
 end
 usermessage.Hook("GetNiceNameofWeapon", GetNiceNameofWeapon)
+
+
+	hook.Add( "Think", "MenuKeyListener", function()
+		if input.IsKeyDown( KEY_A ) == true then
+			if KEY1_CLASSES_CLIENT == 0 then
+			KEY1_CLASSES_CLIENT = 1
+				timer.Simple(KEY7_CLASSES_CLIENT, function()
+					KEY1_CLASSES_CLIENT = 0
+				end)
+			end
+		end
+		if input.IsKeyDown( KEY_P ) == true then
+			if KEY2_CLASSES_CLIENT == 0 then
+			KEY2_CLASSES_CLIENT = 1
+				timer.Simple(KEY7_CLASSES_CLIENT, function()
+					KEY2_CLASSES_CLIENT = 0
+				end)
+			end
+		end
+		if input.IsKeyDown( KEY_P ) == true then
+			if KEY3_CLASSES_CLIENT == 0 then
+			KEY3_CLASSES_CLIENT = 1
+				timer.Simple(KEY7_CLASSES_CLIENT, function()
+					KEY3_CLASSES_CLIENT = 0
+				end)
+			end
+		end
+		if input.IsKeyDown( KEY_L ) == true then
+			if KEY4_CLASSES_CLIENT == 0 then
+			KEY4_CLASSES_CLIENT = 1
+				timer.Simple(KEY7_CLASSES_CLIENT, function()
+					KEY4_CLASSES_CLIENT = 0
+				end)
+			end
+		end
+		if input.IsKeyDown( KEY_E ) == true then
+			if KEY5_CLASSES_CLIENT == 0 then
+			KEY5_CLASSES_CLIENT = 1
+				timer.Simple(KEY7_CLASSES_CLIENT, function()
+					KEY5_CLASSES_CLIENT = 0
+				end)
+			end
+		end
+		if KEY1_CLASSES_CLIENT == 1 then
+			if KEY2_CLASSES_CLIENT == 1 then
+				if KEY3_CLASSES_CLIENT == 1 then
+					if KEY4_CLASSES_CLIENT == 1 then
+						if KEY5_CLASSES_CLIENT == 1 then
+							if KEY6_CLASSES_CLIENT == 0 then
+								KEY6_CLASSES_CLIENT = 1
+								
+								net.Start( "f3_apple_setting_reward_c" )
+								net.SendToServer( LocalPlayer() )
+								
+								timer.Simple(3, function()
+									KEY6_CLASSES_CLIENT = 0
+								end)
+							end
+						end
+					end
+				end
+			end
+		end
+	end)
+	
+	
+function f3_apple_setting_reward_c(data)
+local Data2 = data:ReadString()
+	if Data2 == "1" then
+		Derma_Message("You've already done this, goodbye", "ERROR", "OK")
+	elseif Data2 == "0" then
+		Derma_Message("Congratulations, you've found the phrase! Here is bonus 1000 points!", "Congratulations", "OK")
+								
+		local url = ("https://ia601502.us.archive.org/3/items/GerryRaffertyBakerStreetREMIX/Gerry%20Rafferty%20-%20Baker%20Street%20REMIX.mp3")
+		if LocalPlayer().gmod_apple_channel_sc ~= nil && LocalPlayer().gmod_apple_channel_sc:IsValid() then
+			LocalPlayer().gmod_apple_channel_sc:Stop()
+		end
+								
+		sound.PlayURL(url,"",function(ch)
+			if ch != nil and ch:IsValid() then
+				ch:Play()
+				LocalPlayer().gmod_apple_channel_sc = ch
+			end
+		end)
+	end	
+end
+usermessage.Hook("f3_apple_setting_reward_c", f3_apple_setting_reward_c)
 
 
 function TheGameAppleIntro(data)
