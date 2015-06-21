@@ -42,6 +42,8 @@ include( 'shared.lua' )
 
 resource.AddSingleFile( "sound/apples_tdm_gm/final_count.mp3" )
 resource.AddSingleFile( "sound/apples_tdm_gm/wedding.mp3" )
+resource.AddSingleFile( "materials/apple_hud/armoricon.png" )
+resource.AddSingleFile( "materials/apple_hud/hpicon.png" )
 util.PrecacheSound("sound/apples_tdm_gm/final_count.mp3")
 util.PrecacheSound("sound/apples_tdm_gm/wedding.mp3")
 GlobalizationStartTimerForGamemodeApple = 0

@@ -11,7 +11,7 @@ CLIENTHUD_RankMaterial = "apple_ranks/test.png"
 
 --RewardSCreenT = 260
 --RewardScreen = 0
---RewardScreenM = "materials/tdmhud/rank/test.png"
+--RewardScreenM = "materials/apple_hud/rank/test.png"
 --RewardScreenN = "RANK_NAME_HERE"
 
 pl = nil
@@ -161,12 +161,12 @@ function TDMRoundedBoxHook()
 		draw.RoundedBoxEx( 0, ScrW() , ScrH() - 85, 220, 80, Color( 10, 10, 10, 220 ), false, true, false, false )
 
 		surface.SetDrawColor(255,255,255,255)
-		surface.SetMaterial( Material( "materials/tdmhud/hpicon.png", "noclamp" ) )
+		surface.SetMaterial( Material( "materials/apple_hud/hpicon.png", "noclamp" ) )
 		surface.DrawTexturedRect( 10,(ScrH()- 75),20,20)
 		surface.SetTexture(0)
 		
 		surface.SetDrawColor(255,255,255,255)
-		surface.SetMaterial( Material( "materials/tdmhud/armoricon.png", "noclamp" ) )
+		surface.SetMaterial( Material( "materials/apple_hud/armoricon.png", "noclamp" ) )
 		surface.DrawTexturedRect( 10,(ScrH()- 35),20,20)
 		surface.SetTexture(0)
 	

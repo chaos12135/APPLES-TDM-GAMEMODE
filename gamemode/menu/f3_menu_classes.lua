@@ -40,6 +40,13 @@ if CLIENT then
 				ClassesDeleteButton:SetDisabled(false)
 			end
 			
+			if IsValid(EditClassesWeaponListing) == true then
+				EditClassesWeaponListing:SetDisabled(false)
+			end
+			if IsValid(EditClassesWeaponListingPot) == true then
+				EditClassesWeaponListingPot:SetDisabled(false)
+			end
+			
 			if IsValid(EditClassWeaponListingRemove) == true then
 				EditClassWeaponListingRemove:SetDisabled(true)
 			end
@@ -346,10 +353,10 @@ if CLIENT then
 					EditClassesListing:SetDisabled(false)
 				end
 				if IsValid(EditClassesWeaponListing) == true then
-					EditClassesWeaponListing:SetDisabled(false)
+					EditClassesWeaponListing:SetDisabled(true)
 				end
 				if IsValid(EditClassesWeaponListingPot) == true then
-					EditClassesWeaponListingPot:SetDisabled(false)
+					EditClassesWeaponListingPot:SetDisabled(true)
 				end
 				if IsValid(ClassesAddButton) == true then
 					ClassesAddButton:SetDisabled(false)
