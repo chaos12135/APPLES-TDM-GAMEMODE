@@ -27,6 +27,13 @@ function f3_menu_apple(data)
 	DPanelListF3:EnableHorizontal( false )
 	DPanelListF3:EnableVerticalScrollbar( true )
 	
+	DPanelListF35 = vgui.Create( "DPanelList" )
+	DPanelListF35:SetPos( 0, 0 )
+	DPanelListF35:SetSize( MainMenuTabs:GetWide(), MainMenuTabs:GetTall() )
+	DPanelListF35:SetSpacing( 5 )
+	DPanelListF35:EnableHorizontal( false )
+	DPanelListF35:EnableVerticalScrollbar( true )
+	
 	DPanelListF32 = vgui.Create( "DPanelList" )
 	DPanelListF32:SetPos( 0, 0 )
 	DPanelListF32:SetSize( MainMenuTabs:GetWide(), MainMenuTabs:GetTall() )
@@ -415,7 +422,9 @@ function f3_menu_apple(data)
 	
 	MainMenuTabs:AddSheet( "General Settings", DPanelListF3, "icon16/controller.png", 
 	false, false, "General settings information" )
-	MainMenuTabs:AddSheet( "Edit Ranks", DPanelListF32, "icon16/group.png", 
+	MainMenuTabs:AddSheet( "Ammo Types", DPanelListF35, "icon16/sitemap.png", 
+	false, false, "Edit Ammo Types" )
+	MainMenuTabs:AddSheet( "Ranks", DPanelListF32, "icon16/group.png", 
 	false, false, "Add, Delete, Edit Ranks" )
 	MainMenuTabs:AddSheet( "Classes", DPanelListF33, "icon16/bricks.png", 
 	false, false, "Add, Delete, Edit, Classes" )
@@ -425,6 +434,7 @@ function f3_menu_apple(data)
 	RunRanksMenu(ply)
 	RunClassesMenu(ply)
 	RunPointShopMenu(ply)
+	RunAmmoTypesMenu(ply)
 	
 end
 usermessage.Hook("f3_menu_apple", f3_menu_apple)
