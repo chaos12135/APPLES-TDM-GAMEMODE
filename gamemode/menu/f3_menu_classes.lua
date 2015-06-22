@@ -434,7 +434,7 @@ function CreateNewClassWeaponDBFirst()
 		end
 	end
 	sql.Query( "INSERT INTO apple_deathmatch_classes_Assault ( `ID`, `Nice`, `Name`) VALUES ( '1', 'Five Seven', 'weapon_real_cs_five-seven' )" )
-	sql.Query( "INSERT INTO apple_deathmatch_classes_Assault ( `ID`, `Nice`, `Name`) VALUES ( '2', 'Aug', 'weapon_real_cs_galil' )" )
+	sql.Query( "INSERT INTO apple_deathmatch_classes_Assault ( `ID`, `Nice`, `Name`) VALUES ( '2', 'Galil', 'weapon_real_cs_galil' )" )
 	sql.Query( "INSERT INTO apple_deathmatch_classes_Sniper ( `ID`, `Nice`, `Name`) VALUES ( '1', 'Sniper', 'weapon_real_cs_awp' )" )
 	sql.Query( "INSERT INTO apple_deathmatch_classes_Sniper ( `ID`, `Nice`, `Name`) VALUES ( '2', 'Glock', 'weapon_real_cs_glock18' )" )
 	sql.Query( "INSERT INTO apple_deathmatch_classes_Heavy ( `ID`, `Nice`, `Name`) VALUES ( '1', 'Pump Shotgun', 'weapon_real_cs_pumpshotgun' )" )

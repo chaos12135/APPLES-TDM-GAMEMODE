@@ -29,6 +29,7 @@ AddCSLuaFile( "cs_ignore/client/csr_cvars.lua" )
 
 include( 'teamcreation/sv_createteam.lua' )
 include( 'settings.lua' )
+include( 'menu/soundmenu.lua' )
 include( 'menu/f1_menu.lua' )
 include( 'menu/f2_menu.lua' )
 include( 'menu/f3_menu.lua' )

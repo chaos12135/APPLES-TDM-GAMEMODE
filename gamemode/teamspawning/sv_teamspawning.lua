@@ -128,11 +128,6 @@ return end
 				*/
 				ply:Give(v['Name'])
 			end
-			
-			local AllAmmoGives = sql.Query( "SELECT * FROM apple_deathmatch_ammo_types;" )
-			for k, v in pairs(AllAmmoGives) do
-				ply:GiveAmmo( tonumber(v['Ammo']), tostring(v['Name']), true)
-			end
 		end
 		
 		local WhatIsItClass = sql.QueryValue( "SELECT Value FROM apple_deathmatch_settings WHERE ID = '11';" )
@@ -167,6 +162,12 @@ return end
 					*/
 				end
 			end
+		end
+		
+		local AllAmmoGives = sql.Query( "SELECT * FROM apple_deathmatch_ammo_types;" )
+		if AllAmmoGives == nil then return end
+		for k, v in pairs(AllAmmoGives) do
+			ply:GiveAmmo( tonumber(v['Ammo']), tostring(v['Name']), true )
 		end
 		
 		local NewTeamName_sv_teammodels = string.gsub(team.GetName(ply:Team()), " ", "_")

@@ -43,30 +43,43 @@ if CLIENT then
 		AmmoTypesListELabel:SetText("Amount:")
 		AmmoTypesListELabel:SizeToContents()
 		
+		local AmmoTypesConfirm = vgui.Create( "DButton", DPanelListF35 ) -- Creates a button
+		AmmoTypesConfirm:SetPos( 410, 85 )
+		AmmoTypesConfirm:SetText( "Submit" )
+		AmmoTypesConfirm:SetSize( 60, 20 )
+		AmmoTypesConfirm:SetDisabled( true )
+		AmmoTypesConfirm.DoClick = function()		
+		if IsValid(AmmoTypeEntry) == true then
+			local AmmoTypeEntry = string.gsub(AmmoTypeEntry:GetValue(),"%D", "")
+			local AmmoTypeEntry = string.gsub(AmmoTypeEntry,"%W", "")
+			if string.len(AmmoTypeEntry) != 0 then
+				ReplaceToNumbersONLY2 = AmmoTypeEntry
+			else
+				ReplaceToNumbersONLY2 = "0"
+			end
+				net.Start( "f3_menu_apple_setting_ammo_types" )
+					net.WriteString(WhatAmmoAreWeEditing)
+					net.WriteString(ReplaceToNumbersONLY2)
+				net.SendToServer( ply )
+				
+				if IsValid(AmmoTypesList) then
+					AmmoTypesList:Clear()
+				end
+				
+				net.Start( "f3_menu_apple_ammo_types" )
+				net.SendToServer( ply )
+			end
+		end
+		
 		AmmoTypeEntry = vgui.Create( "DTextEntry", DPanelListF35 )
 		AmmoTypeEntry:SetPos( 410, 40 )
 		AmmoTypeEntry:SetSize(60, 20)
 		AmmoTypeEntry:SetText( 0 )
 		AmmoTypeEntry:SetDisabled( true )
 		AmmoTypeEntry.OnChange = function( self )
-		local AmmoTypeEntry = string.gsub(AmmoTypeEntry:GetValue(),"%D", "")
-		local AmmoTypeEntry = string.gsub(AmmoTypeEntry,"%W", "")
-		if string.len(AmmoTypeEntry) != 0 then
-			ReplaceToNumbersONLY2 = AmmoTypeEntry
-		else
-			ReplaceToNumbersONLY2 = "0"
-		end
-			net.Start( "f3_menu_apple_setting_ammo_types" )
-				net.WriteString(WhatAmmoAreWeEditing)
-				net.WriteString(ReplaceToNumbersONLY2)
-			net.SendToServer( ply )
-			
-			if IsValid(AmmoTypesList) then
-				AmmoTypesList:Clear()
+			if IsValid(AmmoTypesConfirm) == true then
+				AmmoTypesConfirm:SetDisabled( false )
 			end
-			
-			net.Start( "f3_menu_apple_ammo_types" )
-			net.SendToServer( ply )
 		end
 	end
 	

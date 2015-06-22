@@ -46,7 +46,6 @@ if CLIENT then
 		Avatar:SetPos( 660, 40 )
 		Avatar:SetPlayer( LocalPlayer(), 64 )
 		
-		
 		-- What team are you on, if you are even on a team?
 		local CurTeamYPos = 55
 		local CurTeam = vgui.Create( "DLabel", MainMenu )
@@ -78,6 +77,13 @@ if CLIENT then
 		PlayerKillsInfo:SetText( "Your Kills: "..PlayerKills )
 		PlayerKillsInfo:SetColor(Color(255,255,255,255))
 		PlayerKillsInfo:SizeToContents()
+		 
+		local WhatClassesLabel = vgui.Create("DLabel", MainMenu )
+		WhatClassesLabel:SetPos(640,335)
+		WhatClassesLabel:SetColor( Color( 0, 0, 0, 255 ) )
+		WhatClassesLabel:SetFont( "DebugFixed2" )
+		WhatClassesLabel:SetText("Current Class")
+		WhatClassesLabel:SizeToContents()
 		 
 		List_Classes_f1 = vgui.Create( "DComboBox", MainMenu)
 		List_Classes_f1:SetPos(630,350)

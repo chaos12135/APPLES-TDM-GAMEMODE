@@ -407,7 +407,6 @@ function f3_menu_apple(data)
 		if IsValid(SettingsMapsOnPossibleAdd) then
 			SettingsMapsOnPossibleAdd:SetDisabled( true )
 		end
-	
 	end
 
 	net.Start( "f3_menu_apple_fill_settings" )
