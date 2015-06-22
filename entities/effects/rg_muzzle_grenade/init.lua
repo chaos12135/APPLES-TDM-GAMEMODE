@@ -1,4 +1,5 @@
 function EFFECT:Init(data)
+	if CSR.UseMuzzle == nil then return end
 	if (CLIENT and !CSR.UseMuzzle:GetBool()) then return end
 
 	self.WeaponEnt = data:GetEntity()

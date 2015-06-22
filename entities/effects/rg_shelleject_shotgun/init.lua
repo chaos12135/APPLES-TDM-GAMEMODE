@@ -1,6 +1,7 @@
 -- this was made by TetaBonita, not me (Worshipper)
 
 function EFFECT:Init(data)
+	if CSR.ExtraBullets == nil then return end
 	if (CLIENT and !CSR.ExtraBullets:GetBool()) then return end
 
 	self.WeaponEnt = data:GetEntity()

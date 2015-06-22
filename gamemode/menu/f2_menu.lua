@@ -46,6 +46,7 @@ if CLIENT then
 		TeamGenListingP:SetMultiSelect(false)
 		TeamGenListingP:AddColumn("Name")
 		TeamGenListingP:AddColumn("Team")
+		TeamGenListingP:AddColumn("Rank")
 		
 		net.Start( "f2_menu_apple_fill_gen_players" ) -- This is a function just to start loading the teams on the general list
 		net.SendToServer( ply )
@@ -490,8 +491,9 @@ if CLIENT then
 		if IsValid(TeamGenListingP) == true then
 			local pname = data:ReadString()
 			local tname = team.GetName(data:ReadShort())
+			local prank = data:ReadString()
 			local tname = string.gsub(tname, "_", " ")
-			TeamGenListingP:AddLine(pname, tname)
+			TeamGenListingP:AddLine(pname, tname, prank)
 		end
 	end
 	usermessage.Hook("f2_menu_apple_fill_gen_players", f2_menu_apple_fill_gen_players)
@@ -549,6 +551,7 @@ if SERVER then
 				umsg.Start( "f2_menu_apple_fill_gen_players" )
 					umsg.String(v:Nick())
 					umsg.Short(v:Team())
+					umsg.String(sql.QueryValue( "SELECT Rank FROM apple_deathmatch_player_103 WHERE SteamID = '"..tostring(v:UniqueID()).."'" ))
 				umsg.End()
 			end
 		end

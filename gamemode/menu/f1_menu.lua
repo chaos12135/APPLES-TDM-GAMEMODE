@@ -78,7 +78,35 @@ if CLIENT then
 		PlayerKillsInfo:SetText( "Your Kills: "..PlayerKills )
 		PlayerKillsInfo:SetColor(Color(255,255,255,255))
 		PlayerKillsInfo:SizeToContents()
-	
+		 
+		List_Classes_f1 = vgui.Create( "DComboBox", MainMenu)
+		List_Classes_f1:SetPos(630,350)
+		List_Classes_f1:SetSize( 110, 20 )
+		List_Classes_f1.OnSelect = function( panel, index, value )
+			if IsValid(ClassesWeaponListing2) == true then
+				ClassesWeaponListing2:Clear()
+			end
+			
+			net.Start( "f1_menu_apple_class_list22" )
+				net.WriteString(value)
+			net.SendToServer( LocalPlayer() )
+			
+			
+			net.Start( "f1_menu_apple_edit_class_submit_go" )
+				net.WriteString(value)
+			net.SendToServer( LocalPlayer() )
+
+		end
+		
+		net.Start( "f1_menu_apple_class_list" )
+		net.SendToServer( LocalPlayer() )
+
+		ClassesWeaponListing2 = vgui.Create("DListView",MainMenu) -- Shows a list of all available teams
+		ClassesWeaponListing2:SetPos(630, 375)
+		ClassesWeaponListing2:SetSize(110, 115)
+		ClassesWeaponListing2:SetMultiSelect(false)
+		ClassesWeaponListing2:AddColumn("Name")
+		
 	
 		-- Total Deaths of Player
 		local PlayerDeathsInfo = vgui.Create( "DLabel", MainMenu )
@@ -231,11 +259,79 @@ if CLIENT then
 		
 	end
 	usermessage.Hook("f1_menu_apple", f1_menu_apple)
+	
+	
+	function f1_menu_apple_class_list(data)
+		local name = data:ReadString()
+		if IsValid(List_Classes_f1) == true then
+			List_Classes_f1:AddChoice(name)
+		end
+	end
+	usermessage.Hook("f1_menu_apple_class_list", f1_menu_apple_class_list)
+	
+	function f1_menu_apple_class_list22(data)
+		local name = data:ReadString()
+		if IsValid(ClassesWeaponListing2) == true then
+			ClassesWeaponListing2:AddLine(name)
+		end
+	end
+	usermessage.Hook("f1_menu_apple_class_list22", f1_menu_apple_class_list22)
+	
+	
+	function f1_menu_apple_class_list_okl(data)
+		local id = data:ReadShort()
+		if IsValid(List_Classes_f1) == true then
+			List_Classes_f1:ChooseOptionID( id )
+		end
+	end
+	usermessage.Hook("f1_menu_apple_class_list_okl", f1_menu_apple_class_list_okl)
 end
 
 
 
 if SERVER then
+
+	net.Receive( "f1_menu_apple_edit_class_submit_go", function( len, ply ) -- Add new weapon
+	local name = net.ReadString()
+		ply:SetPData("AppleTDMGmodClass", name)
+	end)
+
+	net.Receive( "f1_menu_apple_class_list22", function( len, ply )
+	local NewClassName_sv_Classweapons = string.gsub((net.ReadString()), " ", "_")
+	local NewClassName_sv_Classweapons = sql.SQLStr("apple_deathmatch_classes_"..NewClassName_sv_Classweapons)
+	local NewClassName_sv_Classweapons = string.gsub(NewClassName_sv_Classweapons, "'", "") 
+	local AllClassesW = sql.Query( "SELECT * FROM "..NewClassName_sv_Classweapons..";" )
+	if AllClassesW == nil then return end
+		for k, v in pairs(AllClassesW) do
+			umsg.Start( "f3_menu_apple_class_list22", ply )
+				umsg.String(v['Nice'])
+			umsg.End()
+		end
+	end)
+
+	net.Receive( "f1_menu_apple_class_list", function( len, ply ) -- Add new weapon
+	local AllClasses = sql.Query( "SELECT * FROM apple_deathmatch_classes;" )
+	if AllClasses == nil then return end
+	SelectTheCurrentClass = {}
+		for k, v in pairs(AllClasses) do
+		SelectTheCurrentClass[k] = v['Name']
+			umsg.Start( "f1_menu_apple_class_list", ply )
+				umsg.String(v['Name'])
+			umsg.End()
+		end
+	if ply:GetPData("AppleTDMGmodClass") != nil then 
+		timer.Simple(0.25, function()
+			for k, v in pairs(SelectTheCurrentClass) do
+				if v == ply:GetPData("AppleTDMGmodClass") then
+					umsg.Start( "f1_menu_apple_class_list_okl", ply )
+						umsg.Short(k)
+					umsg.End()
+				end
+			end
+		end)
+	end
+	end)
+
 	function GM:ShowHelp( ply ) -- This hook is called every time F1 is pressed.
 	local PlayerInfo = sql.Query( "SELECT * from apple_deathmatch_player_103 WHERE SteamID = '"..tostring(ply:UniqueID()).."';" )
 	if PlayerInfo == nil then return end
@@ -271,4 +367,7 @@ if SERVER then
 			umsg.Short(f1_PlayerDisc)
 		umsg.End()
 	end
+util.AddNetworkString( "f1_menu_apple_class_list" )
+util.AddNetworkString( "f1_menu_apple_class_list22" )
+util.AddNetworkString( "f1_menu_apple_edit_class_submit_go" )
 end

@@ -1,4 +1,5 @@
 function EFFECT:Init( data )
+	if CSR.Balloons == nil then return end
 	if (CSR.Balloons) then
 		data = EffectData()
 		data:SetStart(self:GetPos())
@@ -8,6 +9,7 @@ function EFFECT:Init( data )
 		data:SetFlags(16)
 		util.Effect("balloons", data)
 	end
+	if CSR.HitEffects == nil then return end
 	if (CLIENT and !CSR.HitEffects:GetBool()) then return end	
 
 	local vOffset = data:GetOrigin()

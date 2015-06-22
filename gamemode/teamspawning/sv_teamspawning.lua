@@ -90,18 +90,13 @@ return end
 	if ply:Team() < 1000 && ply:Team() > 0 then
 	ply:StripWeapons()
 	ply:StripAmmo()
+	ply:AllowFlashlight( true ) 
 		local NewTeamName_sv_teamspawning = string.gsub(team.GetName(ply:Team()), " ", "_")
 		local NewTeamName_sv_teamspawning = sql.SQLStr("apple_deathmatch_"..game.GetMap().."_teamspawning_"..NewTeamName_sv_teamspawning)
 		local NewTeamName_sv_teamspawning = string.gsub(NewTeamName_sv_teamspawning, "'", "")
 		if sql.TableExists(NewTeamName_sv_teamspawning) == true then
 			local TeamSpawnsF = sql.Query( "SELECT * FROM "..NewTeamName_sv_teamspawning.."" )
-			if sql.LastError() != nil then
-				 -- MsgN("sv_teamspawning.lua 93: "..sql.LastError())
-			end
 			local TeamSpawnsC = sql.QueryValue( "SELECT COUNT(ID) from "..NewTeamName_sv_teamspawning..";" )
-			if sql.LastError() != nil then
-				 -- MsgN("sv_teamspawning.lua 97: "..sql.LastError())
-			end
 			local SelectedSpawn = math.random(1,tonumber(TeamSpawnsC))
 			if TeamSpawnsF == nil || TeamSpawnsC == nil then return end
 			for k, v in pairs(TeamSpawnsF) do
@@ -110,21 +105,16 @@ return end
 					ply:SetEyeAngles(Angle(""..v['Roll'].." "..v['Yaw'].." "..v['Pitch']..""))
 				end
 			end
-			if sql.LastError() != nil then
-				-- -- MsgN(sql.LastError())
-			end
 		end
 		
 		local NewTeamName_sv_teamweapons = string.gsub(team.GetName(ply:Team()), " ", "_")
 		local NewTeamName_sv_teamweapons = sql.SQLStr("apple_deathmatch_teamweapons_"..NewTeamName_sv_teamweapons)
 		local NewTeamName_sv_teamweapons = string.gsub(NewTeamName_sv_teamweapons, "'", "")
 		local GiveWeaponsToPlayers = sql.Query( "SELECT * FROM "..NewTeamName_sv_teamweapons..";" )
-		if GiveWeaponsToPlayers == nil || GiveWeaponsToPlayers == false then return end
-		if sql.LastError() != nil then
-			 -- MsgN("sv_teamspawning.lua 118: "..sql.LastError())
-		end
-		for k, v in pairs(GiveWeaponsToPlayers) do
-			ply:Give(v['Name'])
+		if GiveWeaponsToPlayers != nil || GiveWeaponsToPlayers == true then
+			for k, v in pairs(GiveWeaponsToPlayers) do
+				ply:Give(v['Name'])
+			end
 		end
 		
 		local WhatIsItClass = sql.QueryValue( "SELECT Value FROM apple_deathmatch_settings WHERE ID = '11';" )
@@ -134,10 +124,11 @@ return end
 				local NewClassName_sv_Classweapons = sql.SQLStr("apple_deathmatch_classes_"..NewClassName_sv_Classweapons)
 				local NewClassName_sv_Classweapons = string.gsub(NewClassName_sv_Classweapons, "'", "") 
 				local AllClassesW = sql.Query( "SELECT * FROM "..NewClassName_sv_Classweapons..";" )
-				if AllClassesW == nil then return end
+				if AllClassesW != nil || AllClassesW == true then
 					for k, v in pairs(AllClassesW) do
 						ply:Give(v['Name'])
 					end
+				end
 			end
 		end
 		
@@ -146,14 +137,8 @@ return end
 		local NewTeamName_sv_teammodels = string.gsub(NewTeamName_sv_teammodels, "'", "")
 		local GiveModelsToPlayers = sql.QueryValue( "SELECT COUNT(ID) FROM "..NewTeamName_sv_teammodels..";" )
 		if GiveModelsToPlayers == nil || GiveModelsToPlayers == false then return end
-		if sql.LastError() != nil then
-			 -- MsgN("sv_teamspawning.lua 130: "..sql.LastError())
-		end
 		local GiveModelsToPlayersNum = math.random(1, GiveModelsToPlayers)
 		local GiveModelsToPlayers = sql.QueryValue( "SELECT ModelDir FROM "..NewTeamName_sv_teammodels.." WHERE ID = '"..GiveModelsToPlayersNum.."';" )
-		if sql.LastError() != nil then
-			 -- MsgN("sv_teamspawning.lua 135: "..sql.LastError())
-		end
 			ply:SetModel(GiveModelsToPlayers)
 	end
 end

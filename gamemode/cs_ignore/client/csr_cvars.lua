@@ -1,4 +1,3 @@
-AddCSLuaFile()
 
 CSR = {}
 CSR.Balloons = false

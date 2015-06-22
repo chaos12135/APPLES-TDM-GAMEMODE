@@ -392,7 +392,6 @@ end
 
 if SERVER then
 
-
 function CreateNewClassWeaponDB()
 	local GENERICA_CLASSWEAPONS = sql.Query( "SELECT Name from apple_deathmatch_classes;" ) -- Gets just the team name for this
 	if GENERICA_CLASSWEAPONS == nil then return end
@@ -418,6 +417,30 @@ function CreateNewClassWeaponDB()
 	end
 end
 
+function CreateNewClassWeaponDBFirst()
+	local GENERICA_CLASSWEAPONS = sql.Query( "SELECT Name from apple_deathmatch_classes;" ) -- Gets just the team name for this
+	if GENERICA_CLASSWEAPONS == nil then return end
+	if sql.LastError() != nil then
+		 -- MsgN("sv_teamweapons.lua: "..sql.LastError())
+	end
+	for k, v in pairs(GENERICA_CLASSWEAPONS) do
+	local NewClassName_sv_Classweapons = string.gsub(v['Name'], " ", "_")
+	local NewClassName_sv_Classweapons = sql.SQLStr("apple_deathmatch_classes_"..NewClassName_sv_Classweapons)
+	local NewClassName_sv_Classweapons = string.gsub(NewClassName_sv_Classweapons, "'", "") 
+			
+		if sql.TableExists(NewClassName_sv_Classweapons) == false then
+			sql.Query( "CREATE TABLE "..NewClassName_sv_Classweapons.." ( ID int, Nice varchar(255), Name varchar(255))" )
+			-- MsgN("Creating team weapons table for: "..v['TeamName'])
+		end
+	end
+	sql.Query( "INSERT INTO apple_deathmatch_classes_Assault ( `ID`, `Nice`, `Name`) VALUES ( '1', 'Five Seven', 'weapon_real_cs_five-seven' )" )
+	sql.Query( "INSERT INTO apple_deathmatch_classes_Assault ( `ID`, `Nice`, `Name`) VALUES ( '2', 'Aug', 'weapon_real_cs_galil' )" )
+	sql.Query( "INSERT INTO apple_deathmatch_classes_Sniper ( `ID`, `Nice`, `Name`) VALUES ( '1', 'Sniper', 'weapon_real_cs_awp' )" )
+	sql.Query( "INSERT INTO apple_deathmatch_classes_Sniper ( `ID`, `Nice`, `Name`) VALUES ( '2', 'Glock', 'weapon_real_cs_glock18' )" )
+	sql.Query( "INSERT INTO apple_deathmatch_classes_Heavy ( `ID`, `Nice`, `Name`) VALUES ( '1', 'Pump Shotgun', 'weapon_real_cs_pumpshotgun' )" )
+	sql.Query( "INSERT INTO apple_deathmatch_classes_Heavy ( `ID`, `Nice`, `Name`) VALUES ( '2', 'Deagle', 'weapon_real_cs_desert_eagle' )" )
+end
+
 
 	function CreateClassesDB()
 	local GENERICA_SETTINGS = sql.Query( "SELECT * FROM apple_deathmatch_classes;" )
@@ -425,6 +448,10 @@ end
 	
 		if sql.TableExists("apple_deathmatch_classes") == false then
 			sql.Query( "CREATE TABLE apple_deathmatch_classes ( ID int, Name varchar(255) )" )
+			sql.Query( "INSERT INTO apple_deathmatch_classes ( `ID`, `Name`) VALUES ( '1', 'Assault')" )
+			sql.Query( "INSERT INTO apple_deathmatch_classes ( `ID`, `Name`) VALUES ( '2', 'Sniper')" )
+			sql.Query( "INSERT INTO apple_deathmatch_classes ( `ID`, `Name`) VALUES ( '3', 'Heavy')" )
+			CreateNewClassWeaponDBFirst()
 		end
 	end
 	CreateClassesDB()
