@@ -8,6 +8,7 @@
 -----------------------------------------------------------]]
 
 
+
 -- Adding including files
 include( 'shared.lua' )
 include( 'menu/soundmenu.lua' )
@@ -41,6 +42,13 @@ TheGameAppleTimeID = 0
 	local KEY6_CLASSES_CLIENT = 0
 	local KEY7_CLASSES_CLIENT = (1)
 
+function GM:PostDrawViewModel( vm, ply, weapon )
+if ( weapon.UseHands || !weapon:IsScripted() ) then
+local hands = LocalPlayer():GetHands()
+if ( IsValid( hands ) ) then hands:DrawModel() end
+end
+end
+	
 function GetNiceNameofWeapon(data) -- This is to get the weapon name for the favorite weapons table
 local WeaponName = data:ReadEntity()
 local PlayerName = data:ReadEntity()
@@ -164,7 +172,22 @@ end
 usermessage.Hook("TheGameAppleIntro", TheGameAppleIntro)
 
 function PlayWinSoundForAll(data)
-	surface.PlaySound( data:ReadString() ) 
+	local url = data:ReadString()
+
+	if LocalPlayer().gmod_apple_channel ~= nil && LocalPlayer().gmod_apple_channel:IsValid() then
+		LocalPlayer().gmod_apple_channel:Stop()
+	end
+	
+	if LocalPlayer().gmod_apple_channel ~= nil && LocalPlayer().gmod_apple_channel:IsValid() then
+		LocalPlayer().gmod_apple_channel:Stop()
+	end
+	
+	sound.PlayURL(url,"",function(ch)
+		if ch != nil and ch:IsValid() then
+			ch:Play()
+			LocalPlayer().gmod_apple_channel = ch
+		end
+	end)
 end
 usermessage.Hook("PlayWinSoundForAll", PlayWinSoundForAll)
 
@@ -197,13 +220,16 @@ function RestartServer2(data)
 end
 usermessage.Hook("RestartServer2", RestartServer2)
 
-
 function FoundAGreatMap(data)
 	NextMapNameID = data:ReadShort()
 	NextMapName = data:ReadString()
 end
 usermessage.Hook("FoundAGreatMap", FoundAGreatMap)
 
+function AttemptingSuicideKill(data)
+    Derma_Message("Naughty, naughty, you're trying to escape death by killing yourself!", "DENIED BITCH", "Sucks to be you :(")
+end
+usermessage.Hook("AttemptingSuicideKill", AttemptingSuicideKill)
 
 function PlayerIsSpectating(data)
 	AmIAllowedToDisplaySpectator = data:ReadShort()

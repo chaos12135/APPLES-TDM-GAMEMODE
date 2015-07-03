@@ -135,31 +135,33 @@ return end
 			if ply:GetPData("AppleTDMGmodClass") != nil then
 				local NewClassName_sv_Classweapons = string.gsub((ply:GetPData("AppleTDMGmodClass")), " ", "_")
 				local NewClassName_sv_Classweapons = sql.SQLStr("apple_deathmatch_classes_"..NewClassName_sv_Classweapons)
-				local NewClassName_sv_Classweapons = string.gsub(NewClassName_sv_Classweapons, "'", "") 
-				local AllClassesW = sql.Query( "SELECT * FROM "..NewClassName_sv_Classweapons..";" )
-				if AllClassesW != nil || AllClassesW == true then
-				--GetAmmoTypesForClasses = {}
-					for k, v in pairs(AllClassesW) do
-						/*
-						for n,p in pairs(weapons.GetList()) do -- Gets the list of all available weapons on the server
-							local NewString = string.gsub( tostring(v['Name']), "_", " " )
-							if string.find(NewString,"base") == nil then  -- If the weapon is base, don't show it on the list
-								if p['ClassName'] == tostring(v['Name']) then
-									if tostring(p.Primary.Ammo) != nil || tostring(p.Primary.Ammo) != "nil" then
-										GetAmmoTypesForClasses[tostring(p.Primary.Ammo)] = k
+				local NewClassName_sv_Classweapons = string.gsub(NewClassName_sv_Classweapons, "'", "")
+				if sql.TableExists(NewClassName_sv_Classweapons) == true then
+					local AllClassesW = sql.Query( "SELECT * FROM "..NewClassName_sv_Classweapons..";" )
+					if AllClassesW != nil then
+					--GetAmmoTypesForClasses = {}
+						for k, v in pairs(AllClassesW) do
+							/*
+							for n,p in pairs(weapons.GetList()) do -- Gets the list of all available weapons on the server
+								local NewString = string.gsub( tostring(v['Name']), "_", " " )
+								if string.find(NewString,"base") == nil then  -- If the weapon is base, don't show it on the list
+									if p['ClassName'] == tostring(v['Name']) then
+										if tostring(p.Primary.Ammo) != nil || tostring(p.Primary.Ammo) != "nil" then
+											GetAmmoTypesForClasses[tostring(p.Primary.Ammo)] = k
+										end
 									end
 								end
 							end
+							*/
+							ply:Give(v['Name'])
+						end
+						/*
+						for r,s in pairs(GetAmmoTypesForClasses) do
+							MsgN(tostring(r))
+							ply:GiveAmmo( 1, tostring(r), true)
 						end
 						*/
-						ply:Give(v['Name'])
 					end
-					/*
-					for r,s in pairs(GetAmmoTypesForClasses) do
-						MsgN(tostring(r))
-						ply:GiveAmmo( 1, tostring(r), true)
-					end
-					*/
 				end
 			end
 		end

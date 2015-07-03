@@ -7,6 +7,8 @@
 
 -----------------------------------------------------------]]
 
+resource.AddFile("resouce/fonts/UbuntuMono-R.ttf")
+
 -- Adding including files
 AddCSLuaFile( "cl_init.lua" )
 AddCSLuaFile( 'menu/soundmenu.lua' )
@@ -465,8 +467,8 @@ if sql.TableExists( "apple_deathmatch_team" ) == false then
 		 -- MsgN("init.lua: "..sql.LastError())
 	end
 	
-	sql.Query( "INSERT INTO apple_deathmatch_team ( `ID`, `TeamName`, `Kills`, `Deaths`, `Score`, `Red`, `Blue`, `Green`, `Y`, `WhoCreatedMe`, `WhoCreatedMeID`, `WhatTime`, `WinSound` ) VALUES ( '1', 'Red', '0', '0', '0', '255', '0', '0', '255', 'SYSTEM', 'SYSTEM', "..sql.SQLStr(tostring(os.date( "%X - %m/%d/%Y" , os.time() )))..", 'music/hl2_song23_suitsong3.mp3' )" )
-	sql.Query( "INSERT INTO apple_deathmatch_team ( `ID`, `TeamName`, `Kills`, `Deaths`, `Score`, `Red`, `Blue`, `Green`, `Y`, `WhoCreatedMe`, `WhoCreatedMeID`, `WhatTime`, `WinSound` ) VALUES ( '2', 'Blue', '0', '0', '0', '0', '255', '0', '255', 'SYSTEM', 'SYSTEM', "..sql.SQLStr(tostring(os.date( "%X - %m/%d/%Y" , os.time() )))..", 'music/hl2_song23_suitsong3.mp3' )" )
+	sql.Query( "INSERT INTO apple_deathmatch_team ( `ID`, `TeamName`, `Kills`, `Deaths`, `Score`, `Red`, `Blue`, `Green`, `Y`, `WhoCreatedMe`, `WhoCreatedMeID`, `WhatTime`, `WinSound` ) VALUES ( '1', 'Red', '0', '0', '0', '255', '0', '0', '255', 'SYSTEM', 'SYSTEM', "..sql.SQLStr(tostring(os.date( "%X - %m/%d/%Y" , os.time() )))..", "..sql.SQLStr('https://ia601504.us.archive.org/19/items/FettyWapTrapQueen/Fetty%20Wap%20-%20Trap%20Queen.mp3').." )" )
+	sql.Query( "INSERT INTO apple_deathmatch_team ( `ID`, `TeamName`, `Kills`, `Deaths`, `Score`, `Red`, `Blue`, `Green`, `Y`, `WhoCreatedMe`, `WhoCreatedMeID`, `WhatTime`, `WinSound` ) VALUES ( '2', 'Blue', '0', '0', '0', '0', '255', '0', '255', 'SYSTEM', 'SYSTEM', "..sql.SQLStr(tostring(os.date( "%X - %m/%d/%Y" , os.time() )))..", "..sql.SQLStr('https://ia601502.us.archive.org/3/items/112AdamsSong/1-12%20Adam%27s%20Song.mp3').." )" )
 	--	sql.Query( "INSERT INTO apple_deathmatch_team ( `ID`, `TeamName`, `Kills`, `Deaths`, `Score`, `Red`, `Blue`, `Green`, `Y`, `WhoCreatedMe`, `WhoCreatedMeID`, `WhatTime` ) VALUES ( '3', 'Green', '0', '0', '0', '0', '0', '255', '255', 'SYSTEM', 'SYSTEM', "..sql.SQLStr(tostring(os.date( "%X - %d/%m/%Y" , os.time() ))).." )" )
 	-- MsgN("Creating default teams: Red")
 	-- MsgN("Creating default teams: Blue")
@@ -722,7 +724,34 @@ net.Receive( "f3_apple_setting_reward_c", function( len, ply ) -- And this is wh
 	end
 end)
 
+function HandsSpawn(ply)
+local oldhands = ply:GetHands()
+if ( IsValid( oldhands ) ) then oldhands:Remove() end
+local hands = ents.Create( "gmod_hands" )
+if ( IsValid( hands ) ) then
+ply:SetHands( hands )
+hands:SetOwner( ply )
 
+-- Which hands should we use?
+local cl_playermodel = ply:GetInfo( "cl_playermodel" )
+local info = player_manager.TranslatePlayerHands( cl_playermodel )
+if ( info ) then
+hands:SetModel( info.model )
+hands:SetSkin( info.skin )
+hands:SetBodyGroups( info.body )
+end
+
+-- Attach them to the viewmodel
+local vm = ply:GetViewModel( 0 )
+hands:AttachToViewmodel( vm )
+
+vm:DeleteOnRemove( hands )
+ply:DeleteOnRemove( hands )
+
+hands:Spawn()
+end 
+end
+hook.Add( "PlayerSpawn", "HandsSpawn", HandsSpawn )
 
 net.Receive( "GetNiceNameofWeapon", function( len, ply ) -- And this is where I get my weapon data back
 local TheNiceNameForaWeapon = net.ReadString()
@@ -743,6 +772,11 @@ local TheNiceNameForaWeapon = net.ReadString()
 	end
 end)
 
+function GM:CanPlayerSuicide( pl )
+	umsg.Start( "AttemptingSuicideKill", pl )
+	umsg.End()
+	return false
+end
 
 util.AddNetworkString( "f3_apple_setting_reward_c" )
 util.AddNetworkString( "GetNiceNameofWeapon" )

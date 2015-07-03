@@ -20,7 +20,9 @@ function CreateNewTeam_adci(ply)
 		if IsValid(TeamInfoButton) == true then
 			TeamInfoButton:SetDisabled(false)
 		end
-		RunConsoleCommand("stopsound")
+		if LocalPlayer().gmod_apple_channel_test ~= nil && LocalPlayer().gmod_apple_channel_test:IsValid() then
+			LocalPlayer().gmod_apple_channel_test:Stop()
+		end
 	end
 	
 	TeamColorW = vgui.Create( "DColorMixer", MainMenuCreationMenu )
@@ -45,8 +47,21 @@ function CreateNewTeam_adci(ply)
 	TeamWinSoundEdPlay:SetImage( "icon16/control_play.png" )
 	TeamWinSoundEdPlay:SetDisabled(false)
 	TeamWinSoundEdPlay.DoClick = function()
-		RunConsoleCommand("stopsound")
-		timer.Simple(0.1, function() surface.PlaySound( TeamWinSound:GetValue() ) end)
+		if IsValid(TeamWinSound) == true then
+			timer.Simple(0.1, function()
+			local url = TeamWinSound:GetValue()
+				if LocalPlayer().gmod_apple_channel_test ~= nil && LocalPlayer().gmod_apple_channel_test:IsValid() then
+					LocalPlayer().gmod_apple_channel_test:Stop()
+				end
+			
+				sound.PlayURL(url,"",function(ch)
+					if ch != nil and ch:IsValid() then
+						ch:Play()
+						LocalPlayer().gmod_apple_channel_test = ch
+					end
+				end)
+			end)
+		end
 	end
 	
 	TeamNameE = vgui.Create( "DTextEntry", MainMenuCreationMenu )
@@ -69,9 +84,9 @@ function CreateNewTeam_adci(ply)
 	TeamWinSoundLabel:SizeToContents()
 	
 	TeamWinSound = vgui.Create( "DTextEntry", MainMenuCreationMenu )
-	TeamWinSound:SetSize(200, 20)
+	TeamWinSound:SetSize(250, 20)
 	TeamWinSound:SetPos(50, 65)
-	TeamWinSound:SetText("Winning Sound for Team")
+	TeamWinSound:SetText("https://ia601504.us.archive.org/19/items/FettyWapTrapQueen/Fetty%20Wap%20-%20Trap%20Queen.mp3")
 	TeamWinSound.OnChange = function(ply)
 		if string.len(TeamWinSound:GetValue()) != 0 then
 			TeamAddButtonSub:SetDisabled(false)
@@ -80,6 +95,7 @@ function CreateNewTeam_adci(ply)
 		end
 	end
 	
+	/*
 	local TeamWinSoundButton = vgui.Create( "DButton", MainMenuCreationMenu ) -- Creates a button
 	TeamWinSoundButton:SetPos( 255, 65 )
 	TeamWinSoundButton:SetText( "Browse" )
@@ -87,7 +103,7 @@ function CreateNewTeam_adci(ply)
 	TeamWinSoundButton.DoClick = function()
 		SoundMenu()
 	end
-	
+	*/
 	
 	local Scroll = vgui.Create( "DScrollPanel", MainMenuCreationMenu ) //Create the Scroll panel
 	Scroll:SetSize( 355, 270 )
@@ -128,9 +144,9 @@ function CreateNewTeam_adci(ply)
 	TeamAddButtonSub:SetSize( 64, 32 )
 	TeamAddButtonSub:SetImage( "icon16/bullet_go.png" )
 	TeamAddButtonSub.DoClick = function()
-		if TeamWinSound:GetValue() == "Winning Sound for Team" then
-			Derma_Message("You need to choose a winning sound, or type the word NULL in the entry for no sound.", "Sound Error", "OK" )
-		return end
+	--	if TeamWinSound:GetValue() == "Winning Sound for Team" then
+	--		Derma_Message("You need to choose a winning sound, or type the word NULL in the entry for no sound.", "Sound Error", "OK" )
+	--	return end
 		net.Start( "adci_add_new_team" )
 			net.WriteTable(GetAListForNewTeamModels)
 			net.WriteString(TeamNameE:GetValue())
@@ -177,7 +193,9 @@ GetNewNumbersForTotal = 0
 		if IsValid(TeamInfoButton) == true then
 			TeamInfoButton:SetDisabled(false)
 		end
-		RunConsoleCommand("stopsound")
+		if LocalPlayer().gmod_apple_channel_test ~= nil && LocalPlayer().gmod_apple_channel_test:IsValid() then
+			LocalPlayer().gmod_apple_channel_test:Stop()
+		end
 	end
 	
 	TeamColorWEd = vgui.Create( "DColorMixer", MainMenuCreationMenuEd )
@@ -209,12 +227,25 @@ GetNewNumbersForTotal = 0
 	TeamWinSoundEdPlay:SetImage( "icon16/control_play.png" )
 	TeamWinSoundEdPlay:SetDisabled(false)
 	TeamWinSoundEdPlay.DoClick = function()
-		RunConsoleCommand("stopsound")
-		timer.Simple(0.1, function() surface.PlaySound( TeamWinSoundEd:GetValue() ) end)
+		if IsValid(TeamWinSoundEd) == true then
+			timer.Simple(0.1, function()
+			local url = TeamWinSoundEd:GetValue()
+				if LocalPlayer().gmod_apple_channel_test ~= nil && LocalPlayer().gmod_apple_channel_test:IsValid() then
+					LocalPlayer().gmod_apple_channel_test:Stop()
+				end
+			
+				sound.PlayURL(url,"",function(ch)
+					if ch != nil and ch:IsValid() then
+						ch:Play()
+						LocalPlayer().gmod_apple_channel_test = ch
+					end
+				end)
+			end)
+		end
 	end
 	
 	TeamWinSoundEd = vgui.Create( "DTextEntry", MainMenuCreationMenuEd )
-	TeamWinSoundEd:SetSize(200, 20)
+	TeamWinSoundEd:SetSize(250, 20)
 	TeamWinSoundEd:SetPos(50, 65)
 	TeamWinSoundEd:SetText("Winning Sound for Team")
 	TeamWinSoundEd.OnChange = function(ply)
@@ -225,6 +256,7 @@ GetNewNumbersForTotal = 0
 		end
 	end
 	
+	/*
 	local TeamWinSoundButton = vgui.Create( "DButton", MainMenuCreationMenuEd ) -- Creates a button
 	TeamWinSoundButton:SetPos( 255, 65 )
 	TeamWinSoundButton:SetText( "Browse" )
@@ -232,6 +264,7 @@ GetNewNumbersForTotal = 0
 	TeamWinSoundButton.DoClick = function()
 		SoundMenu()
 	end
+	*/
 	
 	TeamNameEEd = vgui.Create( "DTextEntry", MainMenuCreationMenuEd )
 	TeamNameEEd:SetSize(200, 20)
