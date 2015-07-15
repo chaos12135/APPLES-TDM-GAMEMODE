@@ -503,6 +503,11 @@ if CLIENT then
 	end
 	usermessage.Hook("f2_menu_apple_error", f2_menu_apple_error)
 	
+	local function f2_menu_apple_erroru(data) -- You don't have permission
+		chat.AddText(Color(255,0,0,255), "[ULX] You do not have permission to view the gamemode's teams menu!")
+	end
+	usermessage.Hook("f2_menu_apple_erroru", f2_menu_apple_erroru)
+	
 	function WeaponDuplicate(data) -- Gives the error that doesn't allow players to add duplicate weapons if they try.
 		Derma_Message("You can not add two of the same weapons on the same team!","Error","OK")
 	end
@@ -650,10 +655,10 @@ if SERVER then
 
 	function GM:ShowTeam( ply ) -- Launched the F2 Menu
 		if ULib != nil then
-			if ULib.ucl.query( ply, "apple gamemode menu" ) == true then
+			if ULib.ucl.query( ply, "apple gamemode teams" ) == true then
 				LaunchF2Menu(ply)	
-			elseif ULib.ucl.query( ply, "apple gamemode menu" ) == false then
-				umsg.Start( "f2_menu_apple_error", ply )
+			elseif ULib.ucl.query( ply, "apple gamemode teams" ) == false then
+				umsg.Start( "f2_menu_apple_erroru", ply )
 				umsg.End()	
 			end
 		elseif ply:IsSuperAdmin() == true then

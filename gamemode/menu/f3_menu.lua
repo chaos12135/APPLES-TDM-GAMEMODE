@@ -449,6 +449,11 @@ local function f3_menu_apple_error(data) -- You don't have permission
 end
 usermessage.Hook("f3_menu_apple_error", f3_menu_apple_error)
 
+	local function f3_menu_apple_erroru(data) -- You don't have permission
+		chat.AddText(Color(255,0,0,255), "[ULX] You do not have permission to view the gamemode's settings menu!")
+	end
+	usermessage.Hook("f3_menu_apple_erroru", f3_menu_apple_erroru)
+
 
 local function f3_menu_apple_error_map_exists(data) -- You don't have permission
 	Derma_Message("The can not add a map twice!", "ERROR", "OK")
@@ -586,13 +591,6 @@ end
 
 
 if SERVER then
-local function LaunchF3Menu(ply) -- Opens the actual menu
-	umsg.Start( "f3_menu_apple", ply )
-		umsg.Entity(ply)
-	umsg.End()
-end
-
-
 function f3_menu_apple_fill_settings(ply)
 	local SettingInfoScore = sql.QueryValue( "SELECT Value from apple_deathmatch_settings WHERE ID = '1';" )
 	local SettingInfoTime = sql.QueryValue( "SELECT Value from apple_deathmatch_settings WHERE ID = '2';" )
@@ -737,15 +735,20 @@ for l, map in ipairs( maps ) do
 end
 end)
 
-
+local function LaunchF3Menu(ply) -- Opens the actual menu
+	umsg.Start( "f3_menu_apple", ply )
+		umsg.Entity(ply)
+	umsg.End()
+end
 
 function GM:ShowSpare1( ply ) -- Launched the F3 Menu
 	if ULib != nil then
 		if ULib.ucl.query( ply, "apple gamemode settings" ) == true then
 			LaunchF3Menu(ply)	
 		elseif ULib.ucl.query( ply, "apple gamemode settings" ) == false then
-			umsg.Start( "f3_menu_apple_error", ply )
-			umsg.End()	
+			umsg.Start( "f3_menu_apple_erroru", ply )
+			umsg.End()
+			
 		end
 	elseif ply:IsSuperAdmin() == true then
 		LaunchF3Menu(ply)
