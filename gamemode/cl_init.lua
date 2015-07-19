@@ -274,19 +274,25 @@ function APPLE_GM_HUD()
 		draw.SimpleText( "YOU ARE CURRENTLY SPECTATING: "..AmIAllowedToDisplaySpectator3, "TDM_Mini", 45, 25, Color(AmIAllowedToDisplaySpectatorred,AmIAllowedToDisplaySpectatorgreen,AmIAllowedToDisplaySpectatorblue,255), TEXT_ALIGN_LEFT, TEXT_ALIGN_LEFT, 0 )
 	end
 	if TheLobbyAppleTimeID == 1 then
-	local TheTimeQ = TheLobbyAppleTime - math.Round(CurTime())
+	local TheTimeQ = TheLobbyAppleTime - CurTime()
 		if TheTimeQ >= 0 then
-			draw.RoundedBoxEx( 0, 25, 145, 260, 35, Color(0,0,0,255), false, true, false, false )
-			draw.SimpleText( "Lobby Timer: "..TheTimeQ, "TDM_Mini", 45, 145, Color(255,255,255,255), TEXT_ALIGN_LEFT, TEXT_ALIGN_LEFT, 0 )
+			surface.SetFont( "TDM_Mini" )
+			local lw, lh = surface.GetTextSize( "Lobby Timer: " .. string.ToMinutesSecondsMilliseconds( TheTimeQ ) )
+			draw.RoundedBoxEx( 0, 25, 145, lw + 6, 35, Color(0,0,0,255), false, true, false, false )
+			draw.SimpleText( "Lobby Timer: " .. string.ToMinutesSecondsMilliseconds( TheTimeQ ), "TDM_Mini", 28, 145, Color(255,255,255,255), TEXT_ALIGN_LEFT, TEXT_ALIGN_LEFT, 0 )
 		end
 	end
-	if TheGameAppleTimeID == 1 then
-	local TheTimeQ = TheGameAppleTime - math.Round(CurTime())
+
+--	if TheGameAppleTimeID == 1 then
+	local TheTimeQ = TheGameAppleTime - CurTime()
 		if TheTimeQ >= 0 then
-			draw.RoundedBoxEx( 0, 25, 145, 260, 35, Color(0,0,0,255), false, true, false, false )
-			draw.SimpleText( "Game Timer: "..TheTimeQ, "TDM_Mini", 45, 145, Color(255,255,255,255), TEXT_ALIGN_LEFT, TEXT_ALIGN_LEFT, 0 )
+			surface.SetFont( "TDM_Mini" )
+			local lw, lh = surface.GetTextSize( "Game Timer: " .. string.ToMinutesSecondsMilliseconds( TheTimeQ ) )
+			draw.RoundedBoxEx( 0, 25, 145, lw + 6, 35, Color(0,0,0,255), false, true, false, false )
+			draw.SimpleText( "Game Timer: " .. string.ToMinutesSecondsMilliseconds( TheTimeQ ), "TDM_Mini", 28, 145, Color(255,255,255,255), TEXT_ALIGN_LEFT, TEXT_ALIGN_LEFT, 0 )
 		end
-	end
+--	end
+
 	if YouAreTheMVP == 1 then
 		draw.RoundedBoxEx( 0, ScrW()/2 - 500, 48, 1000, 58, Color(0,0,0,255), false, true, false, false )
 		draw.SimpleText( "CONGRATULATIONS, YOU ARE MVP", "TDM_Ammo_Secondary", ScrW()/2, 75, Color(255,255,255,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 0 )

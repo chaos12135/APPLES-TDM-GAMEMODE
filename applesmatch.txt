@@ -1,8 +1,8 @@
 "tdm"
 {
 	"base"		"base"
-	"title"		"Apple TDM 1.2"
-	"version"	"1.2"
+	"title"		"Apple TDM 1.3"
+	"version"	"1.3"
 	"workshopid"	"452370591"
 	"author_name"	"Dr./Mr. Apple"
 	"author_email"	"support@f4egaming.com"
