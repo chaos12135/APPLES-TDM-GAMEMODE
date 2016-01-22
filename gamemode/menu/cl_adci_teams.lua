@@ -68,6 +68,7 @@ function CreateNewTeam_adci(ply)
 	TeamNameE:SetSize(200, 20)
 	TeamNameE:SetPos(50, 35)
 	TeamNameE:SetText("Name of Team")
+	/*
 	TeamNameE.OnChange = function(ply)
 		if string.len(TeamNameE:GetValue()) != 0 then
 			TeamAddButtonSub:SetDisabled(false)
@@ -75,6 +76,7 @@ function CreateNewTeam_adci(ply)
 			TeamAddButtonSub:SetDisabled(true)
 		end
 	end
+	*/
 	
 	local TeamWinSoundLabel = vgui.Create("DLabel", MainMenuCreationMenu )
 	TeamWinSoundLabel:SetPos(10,67)
@@ -87,6 +89,7 @@ function CreateNewTeam_adci(ply)
 	TeamWinSound:SetSize(250, 20)
 	TeamWinSound:SetPos(50, 65)
 	TeamWinSound:SetText("https://ia601504.us.archive.org/19/items/FettyWapTrapQueen/Fetty%20Wap%20-%20Trap%20Queen.mp3")
+	/*
 	TeamWinSound.OnChange = function(ply)
 		if string.len(TeamWinSound:GetValue()) != 0 then
 			TeamAddButtonSub:SetDisabled(false)
@@ -94,6 +97,7 @@ function CreateNewTeam_adci(ply)
 			TeamAddButtonSub:SetDisabled(true)
 		end
 	end
+	*/
 	
 	/*
 	local TeamWinSoundButton = vgui.Create( "DButton", MainMenuCreationMenu ) -- Creates a button
@@ -129,15 +133,34 @@ function CreateNewTeam_adci(ply)
 			for l, p in pairs(GetAListForNewTeamModels) do
 				TeamAddList:AddLine( l, p )
 			end
+			--TeamAddButtonSub:SetDisabled(false)
 		end
 	end
 	
+	AGetNewNumbersForTotal = 0
+	
 	TeamAddList = vgui.Create("DListView",MainMenuCreationMenu)
 	TeamAddList:SetPos(375, 225)
-	TeamAddList:SetSize(215, 270)
+	TeamAddList:SetSize(215, 246)
 	TeamAddList:SetMultiSelect(true)
 	TeamAddList:AddColumn("Name")
 	TeamAddList:AddColumn("Model")
+	TeamAddList:AddLine( "gman", "models/player/gman_high.mdl" )
+	GetAListForNewTeamModels["gman"]="models/player/gman_high.mdl"
+	
+	local TeamErrorLabel = vgui.Create("DLabel", MainMenuCreationMenu )
+	TeamErrorLabel:SetPos(10,207)
+	TeamErrorLabel:SetColor( Color( 0, 0, 0, 255 ) )
+	TeamErrorLabel:SetFont( "DebugFixed2" )
+	TeamErrorLabel:SetText("Due to a bug, you are not able to delete any models when creating teams.")
+	TeamErrorLabel:SizeToContents()
+	
+	local TeamErrorLabel2 = vgui.Create("DLabel", MainMenuCreationMenu )
+	TeamErrorLabel2:SetPos(380,475)
+	TeamErrorLabel2:SetColor( Color( 0, 0, 0, 255 ) )
+	TeamErrorLabel2:SetFont( "DebugFixed2" )
+	TeamErrorLabel2:SetText("You must edit the team to delete models")
+	TeamErrorLabel2:SizeToContents()
 	
 	TeamAddButtonSub = vgui.Create( "DImageButton", MainMenuCreationMenu )
 	TeamAddButtonSub:SetPos( 480, 190 )
@@ -147,6 +170,18 @@ function CreateNewTeam_adci(ply)
 	--	if TeamWinSound:GetValue() == "Winning Sound for Team" then
 	--		Derma_Message("You need to choose a winning sound, or type the word NULL in the entry for no sound.", "Sound Error", "OK" )
 	--	return end
+	
+	if string.len(TeamWinSound:GetValue()) == 0 && string.len(TeamNameE:GetValue()) == 0 then
+		Derma_Message("You need to have a sound and team name entered!", "Sound Error", "OK" )
+		return
+	elseif string.len(TeamNameE:GetValue()) == 0 then
+		Derma_Message("You need to have a team name entered!", "Sound Error", "OK" )
+		return
+	elseif string.len(TeamWinSound:GetValue()) == 0 then
+		Derma_Message("You need to have a sound entered!", "Sound Error", "OK" )
+		return
+	end
+
 		net.Start( "adci_add_new_team" )
 			net.WriteTable(GetAListForNewTeamModels)
 			net.WriteString(TeamNameE:GetValue())
@@ -165,7 +200,7 @@ function CreateNewTeam_adci(ply)
 		net.Start( "f2_menu_apple_fill_gen_players" )
 		net.SendToServer( ply )
 	end
-	TeamAddButtonSub:SetDisabled(true)
+	TeamAddButtonSub:SetDisabled(false)
 end
 
 
@@ -303,6 +338,7 @@ GetNewNumbersForTotal = 0
 			end
 		end
 	end
+	
 	
 	TeamAddListEd = vgui.Create("DListView",MainMenuCreationMenuEd)
 	TeamAddListEd:SetPos(375, 225)

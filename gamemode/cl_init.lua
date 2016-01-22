@@ -34,6 +34,7 @@ NextMapNameID = 0
 RestartServerPleaseNowID = 0
 YouAreNotTheMVPID = 0
 TheGameAppleTimeID = 0
+TheGameAppleTime = 0
 	local KEY1_CLASSES_CLIENT = 0
 	local KEY2_CLASSES_CLIENT = 0
 	local KEY3_CLASSES_CLIENT = 0
@@ -63,6 +64,7 @@ end
 usermessage.Hook("GetNiceNameofWeapon", GetNiceNameofWeapon)
 
 
+/*
 	hook.Add( "Think", "MenuKeyListener", function()
 		if input.IsKeyDown( KEY_A ) == true then
 			if KEY1_CLASSES_CLIENT == 0 then
@@ -125,14 +127,16 @@ usermessage.Hook("GetNiceNameofWeapon", GetNiceNameofWeapon)
 			end
 		end
 	end)
-	
+*/
+
+
 	
 function f3_apple_setting_reward_c(data)
 local Data2 = data:ReadString()
 	if Data2 == "1" then
-		Derma_Message("You've already done this, goodbye", "ERROR", "OK")
+		Derma_Message("You've already done this, keep this secret though!", "ERROR", "OK")
 	elseif Data2 == "0" then
-		Derma_Message("Congratulations, you've found the phrase! Here is bonus 1000 points!", "Congratulations", "OK")
+		Derma_Message("Congratulations, you've found the phrase! Here are 1000 bonus points, and remember, shhh!", "Congratulations", "OK")
 								
 		local url = ("https://ia601502.us.archive.org/3/items/GerryRaffertyBakerStreetREMIX/Gerry%20Rafferty%20-%20Baker%20Street%20REMIX.mp3")
 		if LocalPlayer().gmod_apple_channel_sc ~= nil && LocalPlayer().gmod_apple_channel_sc:IsValid() then

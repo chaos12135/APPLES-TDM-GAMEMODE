@@ -29,6 +29,52 @@ end
 usermessage.Hook("HUD_GET_POINTS", HUD_GET_POINTS)
 
 
+
+
+function PlayerIsSpawnSafeA(data)
+	local NewTarget = data:ReadEntity()
+	local IDV = data:ReadShort()
+	NewTarget:SetPData("PlayerIsSpawnSafe",IDV)
+end
+usermessage.Hook("PlayerIsSpawnSafeA", PlayerIsSpawnSafeA)
+
+
+
+function ICanSeeYou()
+	local ply = LocalPlayer()
+	
+	for id, target in pairs(player.GetAll()) do
+
+		if target:Alive() && target != ply then
+		
+			local targetPos = target:GetPos() + Vector(0,0,80)
+		--	local targetDistance = math.floor((ply:GetPos():Distance( targetPos ))/40)
+			local targetScreenpos = targetPos:ToScreen()
+			
+			if target:GetPData("PlayerIsSpawnSafe") == nil || target:GetPData("PlayerIsSpawnSafe") == NULL then
+				net.Start( "PlayerIsSpawnSafeFix" )
+				net.SendToServer( ply )
+			end
+
+			if tonumber(target:GetPData("PlayerIsSpawnSafe")) == 1 then
+			
+				local tr = util.TraceLine( util.GetPlayerTrace( LocalPlayer() ) )
+				if IsValid( tr.Entity ) then
+					surface.SetTextColor(200,25,25,255)
+					surface.SetFont("default")
+					surface.SetTextPos( tonumber( targetScreenpos.x - 45 ), tonumber( targetScreenpos.y ) )
+					surface.DrawText("SPAWN PROTECTED")
+				end
+				
+			end
+		end
+
+	end
+
+end
+hook.Add("HUDPaint", "DrawCoolScript", ICanSeeYou)
+
+
 /*
 timer.Create( "RewardSCreenT", .005, 0, function()
 if RewardSCreenT == 0 then 

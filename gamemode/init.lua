@@ -45,6 +45,7 @@ include( 'hud/sv_apple_hud.lua' )
 include( 'teamspawning/sv_teamspawning.lua' )
 include( 'teamweapons/sv_teamweapons.lua' )
 include( 'teammodels/sv_teammodels.lua' )
+include( 'teamlogs/sv_teamlogs.lua' )
 include( 'shared.lua' )
 
 include( 'cs_ignore/server/csr_cvars.lua' )
@@ -264,8 +265,7 @@ function ClassesSystemActivated( ply )
 end
 
 
-
-function PlaceMeOnTheLowestTeamAvaialable( ply ) -- Find the lowest team available, hopefully Garry' fully fixed this
+function PlaceMeOnTheLowestTeamAvaialable( ply ) -- Find the lowest team available, hopefully Garry' fully fixed this2
 	ply:SetTeam(team.BestAutoJoinTeam())
 	---- MsgN(team.GetName(ply:Team()).."("..ply:Team()..")")
 end
@@ -330,9 +330,23 @@ local CheckGameTimeTeamInfo = sql.QueryValue( "SELECT COUNT(ID) from apple_death
 		GAMEMODE:PlayerSpawnAsSpectator( ply )
 		PlaceSecondPlayerOnTeam(ply)
 		ClassesSystemActivated( ply )
-	elseif GlobalizationStartTimerForGamemodeApple == 1 then -- The game has started, so place spectator mode, and find a player to spectate
+	elseif GlobalizationStartTimerForGamemodeApple == 1 && tonumber(sql.QueryValue( "SELECT Value from apple_deathmatch_settings WHERE ID = '14';" )) == 0 then -- The game has started, so place spectator mode, and find a player to spectate
+		MsgN("Player has joined during game, but is NOT allowed to play due to setting")
 		GAMEMODE:PlayerSpawnAsSpectator( ply )
 		YouChooseMeToSpectate(ply) -- This chooses a players to spectate, and also makes sure it's not the player himself
+	elseif GlobalizationStartTimerForGamemodeApple == 1 && tonumber(sql.QueryValue( "SELECT Value from apple_deathmatch_settings WHERE ID = '14';" )) == 1 then
+		MsgN("Player has joined during game, but is allowed to play due to setting")
+		PlaceMeOnTheLowestTeamAvaialable(ply)
+		ClassesSystemActivated( ply )
+		timer.Simple(1, function()
+			ply:StripWeapons()
+			ply:StripAmmo()
+			ply:Spawn()
+			umsg.Start( "TheGameAppleTimeFunc", ply )
+				umsg.Short(1)
+				umsg.Short(GlobalSettingInfoTime)
+			umsg.End()
+		end)
 	else
 		GAMEMODE:PlayerSpawnAsSpectator( ply ) -- This is for if the game hasn't started, and there are more than two players
 		PlaceMeOnTheLowestTeamAvaialable( ply ) -- This places the person on the next following team with the lowest number of people on it
@@ -704,25 +718,29 @@ function CheckMVP(attacker)
 end
 
 
-net.Receive( "f3_apple_setting_reward_c", function( len, ply ) -- And this is where I get my weapon data back
-	if ply:GetPData("f3_apple_setting_reward_c") == nil || ply:GetPData("f3_apple_setting_reward_c") == "0" then
-		local GetInfo = sql.QueryValue( "SELECT Score FROM apple_deathmatch_player_103 WHERE SteamID = '"..tostring(ply:UniqueID()).."';" )
-		sql.Query( "UPDATE apple_deathmatch_player_103 SET Score = '"..(GetInfo+1000).."' WHERE SteamID = '"..tostring(ply:UniqueID()).."';" )
-		
-		umsg.Start( "HUD_GET_POINTS", ply ) -- Because I can't seem to find a way to get weapons names without going to client, I send info to client and get it back
-			umsg.Short(tonumber(GetInfo+1000))
-		umsg.End()
-		
-		umsg.Start( "f3_apple_setting_reward_c", ply )
-			umsg.String("0")
-		umsg.End()	
-		ply:SetPData("f3_apple_setting_reward_c",1)
-	elseif ply:GetPData("f3_apple_setting_reward_c") == "1" then
-		umsg.Start( "f3_apple_setting_reward_c", ply )
-			umsg.String("1")
-		umsg.End()	
+--net.Receive( "f3_apple_setting_reward_c", function( len, ply ) -- And this is where I get my weapon data back
+hook.Add("PlayerSay", "OnPlayerChatSecret", function(ply, text)
+	if text == "threelettersback" then
+		if ply:GetPData("f3_apple_setting_reward_c") == nil || ply:GetPData("f3_apple_setting_reward_c") == "0" then
+			local GetInfo = sql.QueryValue( "SELECT Score FROM apple_deathmatch_player_103 WHERE SteamID = '"..tostring(ply:UniqueID()).."';" )
+			sql.Query( "UPDATE apple_deathmatch_player_103 SET Score = '"..(GetInfo+1000).."' WHERE SteamID = '"..tostring(ply:UniqueID()).."';" )
+			
+			umsg.Start( "HUD_GET_POINTS", ply ) -- Because I can't seem to find a way to get weapons names without going to client, I send info to client and get it back
+				umsg.Short(tonumber(GetInfo+1000))
+			umsg.End()
+			
+			umsg.Start( "f3_apple_setting_reward_c", ply )
+				umsg.String("0")
+			umsg.End()	
+			ply:SetPData("f3_apple_setting_reward_c",1)
+		elseif ply:GetPData("f3_apple_setting_reward_c") == "1" then
+			umsg.Start( "f3_apple_setting_reward_c", ply )
+				umsg.String("1")
+			umsg.End()	
+		end
 	end
 end)
+--end)
 
 function HandsSpawn(ply)
 local oldhands = ply:GetHands()
@@ -780,3 +798,4 @@ end
 
 util.AddNetworkString( "f3_apple_setting_reward_c" )
 util.AddNetworkString( "GetNiceNameofWeapon" )
+util.AddNetworkString( "PlayerIsSpawnSafeFix" )

@@ -195,7 +195,6 @@ net.Receive( "adci_edit_team", function( len, ply )
 					end
 				end
 			end
-		end
 		
 			
 			local NewTeamName_sv_teammodels = string.gsub(tostring(OldTeamName), " ", "_")
@@ -237,6 +236,12 @@ net.Receive( "adci_edit_team", function( len, ply )
 					end
 				end
 			end
+			
+			if tostring(TeamName) == tostring(sql.QueryValue( "SELECT TeamName from apple_deathmatch_team WHERE TeamName = '"..tostring(TeamName).."';" )) then 
+				umsg.Start( "creating_teams_error", ply )
+				umsg.End()
+			return end
+		end
 		
 		umsg.Start( "creating_teams_not_error", ply )
 		umsg.End()
@@ -252,9 +257,6 @@ net.Receive( "adci_edit_team", function( len, ply )
 		end
 	
 		CreateTeamsForServer()
-	else
-		umsg.Start( "creating_teams_error", ply )
-		umsg.End()
 	end
 	
 --PrintTable(team.GetAllTeams())

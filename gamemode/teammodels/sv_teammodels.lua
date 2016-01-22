@@ -9,7 +9,7 @@ end)
 
 
 function CreateNewTeamModelsDB()
-	local GENERICA_TEAMMOELS = sql.Query( "SELECT TeamName from apple_deathmatch_team;" ) -- Gets just the team name for this
+	local GENERICA_TEAMMOELS = sql.Query( "SELECT * from apple_deathmatch_team;" ) -- Gets just the team name for this
 	if GENERICA_TEAMMOELS == nil then return end
 	for k, v in pairs(GENERICA_TEAMMOELS) do
 	local NewTeamName_sv_teammodels = string.gsub(v['TeamName'], " ", "_") -- Makes sure all the spaces in the team name are replaces with underscores
@@ -21,10 +21,13 @@ function CreateNewTeamModelsDB()
 			if sql.LastError() != nil then
 				 -- MsgN("sv_teammodels.lua: "..sql.LastError())
 			end
-			sql.Query( "INSERT INTO "..NewTeamName_sv_teammodels.." ( `ID`, `ModelName`, `ModelDir`) VALUES ( '1', 'gman', 'models/player/gman_high.mdl')" )
-			-- MsgN("Creating team models table for: "..v['TeamName'])
-			if sql.LastError() != nil then
-				 -- MsgN("sv_teammodels.lua: "..sql.LastError())
+			local OnlyStartOnce = sql.QueryValue( "SELECT Value FROM apple_deathmatch_settings WHERE ID = '13';" )
+			if OnlyStartOnce == "0" then
+				sql.Query( "INSERT INTO "..NewTeamName_sv_teammodels.." ( `ID`, `ModelName`, `ModelDir`) VALUES ( '1', 'gman', 'models/player/gman_high.mdl')" )
+				-- MsgN("Creating team models table for: "..v['TeamName'])
+				if sql.LastError() != nil then
+					 -- MsgN("sv_teammodels.lua: "..sql.LastError())
+				end
 			end
 		elseif sql.TableExists(NewTeamName_sv_teammodels) == true then
 			local CacheModels = sql.Query( "SELECT * FROM "..NewTeamName_sv_teammodels..";" )
@@ -38,6 +41,7 @@ function CreateNewTeamModelsDB()
 			end
 		end	
 	end
+	sql.Query( "UPDATE apple_deathmatch_settings SET Value = '1' WHERE ID = '13'" )
 end
 
 

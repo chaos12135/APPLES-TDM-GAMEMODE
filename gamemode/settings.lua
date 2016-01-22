@@ -133,6 +133,16 @@ function CreateSettingsDB()
 		if sql.QueryValue( "SELECT ID FROM apple_deathmatch_settings WHERE ID = '11';" ) == nil then
 			sql.Query( "INSERT INTO apple_deathmatch_settings ( `ID`, `Type`, `Value`) VALUES ( '11', 'Classes', '0')" )
 		end
+		if sql.QueryValue( "SELECT ID FROM apple_deathmatch_settings WHERE ID = '12';" ) == nil then
+			sql.Query( "INSERT INTO apple_deathmatch_settings ( `ID`, `Type`, `Value`) VALUES ( '12', 'SpawnKillPrevention', '1')" )
+		end
+		if sql.QueryValue( "SELECT ID FROM apple_deathmatch_settings WHERE ID = '13';" ) == nil then
+			sql.Query( "INSERT INTO apple_deathmatch_settings ( `ID`, `Type`, `Value`) VALUES ( '13', 'STARTUPCREATORMODELS', '0')" )
+		end
+		if sql.QueryValue( "SELECT ID FROM apple_deathmatch_settings WHERE ID = '14';" ) == nil then
+			sql.Query( "INSERT INTO apple_deathmatch_settings ( `ID`, `Type`, `Value`) VALUES ( '14', 'DisableLobbyTimer', '0')" )
+		end
+
 end
 
 

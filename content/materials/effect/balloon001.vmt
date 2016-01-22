@@ -1,0 +1,7 @@
+"UnlitGeneric"
+{
+	"$basetexture" "effect/balloon001"
+	"$translucent" 1
+	"$vertexalpha" 1
+	"$vertexcolor" 1
+}

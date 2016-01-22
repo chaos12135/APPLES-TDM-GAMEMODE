@@ -104,6 +104,28 @@ function f3_menu_apple(data)
 	GameEndingTimeValueLabel:SetText("Time Limit (minutes):")
 	GameEndingTimeValueLabel:SizeToContents()
 	
+	local DisableLobbyTimerValueLabel = vgui.Create("DLabel", DPanelListF3 )
+	DisableLobbyTimerValueLabel:SetPos(115,45)
+	DisableLobbyTimerValueLabel:SetColor( Color( 0, 0, 0, 255 ) )
+	DisableLobbyTimerValueLabel:SetFont( "DebugFixed2" )
+	DisableLobbyTimerValueLabel:SetText("Allow Player(s) to Join'N'Play:")
+	DisableLobbyTimerValueLabel:SizeToContents()
+	
+	DisableLobbyTimer = vgui.Create( "DCheckBox", DPanelListF3 )
+	DisableLobbyTimer:SetPos( 125, 62 )
+	DisableLobbyTimer:SetValue( 1 )
+	DisableLobbyTimer.OnChange = function( self )
+		if DisableLobbyTimer:GetChecked() == false then
+			net.Start( "f3_menu_apple_setting_join_and_play" )
+				net.WriteString(0)
+			net.SendToServer( ply )
+		elseif DisableLobbyTimer:GetChecked() == true then
+			net.Start( "f3_menu_apple_setting_join_and_play" )
+				net.WriteString(1)
+			net.SendToServer( ply )
+		end
+	end
+	
 	local GameIntroSoundValueLabel = vgui.Create("DLabel", DPanelListF3 )
 	GameIntroSoundValueLabel:SetPos(2,87)
 	GameIntroSoundValueLabel:SetColor( Color( 0, 0, 0, 255 ) )
@@ -117,6 +139,13 @@ function f3_menu_apple(data)
 	GameShowSpawnsValueLabel:SetFont( "DebugFixed2" )
 	GameShowSpawnsValueLabel:SetText("Show Spawn Points:")
 	GameShowSpawnsValueLabel:SizeToContents()
+	
+	local SpawnKillPreventionValueLabel = vgui.Create("DLabel", DPanelListF3 )
+	SpawnKillPreventionValueLabel:SetPos(150,130)
+	SpawnKillPreventionValueLabel:SetColor( Color( 0, 0, 0, 255 ) )
+	SpawnKillPreventionValueLabel:SetFont( "DebugFixed2" )
+	SpawnKillPreventionValueLabel:SetText("SpawnKill Prevention:")
+	SpawnKillPreventionValueLabel:SizeToContents()
 	
 	local GameLevelUpPointsLabel = vgui.Create("DLabel", DPanelListF3 )
 	GameLevelUpPointsLabel:SetPos(2,168)
@@ -270,6 +299,21 @@ function f3_menu_apple(data)
 			net.SendToServer( ply )
 		elseif GameShowSpawns:GetChecked() == true then
 			net.Start( "f3_menu_apple_setting_show_spawns" )
+				net.WriteString(1)
+			net.SendToServer( ply )
+		end
+	end
+	
+	GameKillerPreventer = vgui.Create( "DCheckBox", DPanelListF3 )
+	GameKillerPreventer:SetPos( 162, 145 )
+	GameKillerPreventer:SetValue( 1 )
+	GameKillerPreventer.OnChange = function( self )
+		if GameKillerPreventer:GetChecked() == false then
+			net.Start( "f3_menu_apple_setting_killer_preventer" )
+				net.WriteString(0)
+			net.SendToServer( ply )
+		elseif GameKillerPreventer:GetChecked() == true then
+			net.Start( "f3_menu_apple_setting_killer_preventer" )
 				net.WriteString(1)
 			net.SendToServer( ply )
 		end
@@ -472,6 +516,8 @@ local RewardLevel = data:ReadString()
 local RewardLevelMulti = data:ReadString()
 local RewardLevelSong = data:ReadString()
 local RewardLevelSongTime = data:ReadString()
+local SpawnKillerP = data:ReadString()
+local DisableLobbyTimerP = data:ReadString()
 	if IsValid(GameEndingScoreValue) == true then
 		GameEndingScoreValue:SetText(Score)
 	end
@@ -542,7 +588,21 @@ local RewardLevelSongTime = data:ReadString()
 			GameShowSpawns:SetChecked(false)
 		end
 	end
-
+	
+	if IsValid(GameKillerPreventer) == true then
+		if tonumber(SpawnKillerP) == 1 then
+			GameKillerPreventer:SetChecked(true)
+		elseif tonumber(SpawnKillerP) == 0 then
+			GameKillerPreventer:SetChecked(false)
+		end
+	end
+	if IsValid(DisableLobbyTimer) == true then
+		if tonumber(DisableLobbyTimerP) == 1 then
+			DisableLobbyTimer:SetChecked(true)
+		elseif tonumber(DisableLobbyTimerP) == 0 then
+			DisableLobbyTimer:SetChecked(false)
+		end
+	end
 end
 usermessage.Hook("f3_menu_apple_fill_settings", f3_menu_apple_fill_settings)
 
@@ -602,6 +662,8 @@ function f3_menu_apple_fill_settings(ply)
 	local SettingsInfoRewardLevelMutli = sql.QueryValue( "SELECT Value from apple_deathmatch_settings WHERE ID = '8';" )
 	local SettingsInfoRewardLevelSong = sql.QueryValue( "SELECT Value from apple_deathmatch_settings WHERE ID = '9';" )
 	local SettingsInfoRewardLevelSongTime = sql.QueryValue( "SELECT Value from apple_deathmatch_settings WHERE ID = '10';" )
+	local SettingsInfoSpawnKillerP = sql.QueryValue( "SELECT Value from apple_deathmatch_settings WHERE ID = '12';" )
+	local SettingsInfoJoinAndPlay = sql.QueryValue( "SELECT Value from apple_deathmatch_settings WHERE ID = '14';" )
 	if SettingInfoScore == nil || SettingInfoTime == nil then return end
 	umsg.Start( "f3_menu_apple_fill_settings", ply )
 		umsg.String(SettingInfoScore)
@@ -614,6 +676,8 @@ function f3_menu_apple_fill_settings(ply)
 		umsg.String(SettingsInfoRewardLevelMutli)
 		umsg.String(SettingsInfoRewardLevelSong)
 		umsg.String(SettingsInfoRewardLevelSongTime)
+		umsg.String(SettingsInfoSpawnKillerP)
+		umsg.String(SettingsInfoJoinAndPlay)
 	umsg.End()
 end
 
@@ -703,9 +767,19 @@ net.Receive( "f3_menu_apple_setting_reward_level", function( len, ply )
 	sql.Query( "UPDATE apple_deathmatch_settings SET Value = '"..ReWardLevel.."' WHERE ID = '7' " )
 end)
 
+net.Receive( "f3_menu_apple_setting_join_and_play", function( len, ply )
+	local PlayAndJoin = net.ReadString()
+	sql.Query( "UPDATE apple_deathmatch_settings SET Value = '"..PlayAndJoin.."' WHERE ID = '14' " )
+end)
+
 net.Receive( "f3_menu_apple_setting_reward_level_multi", function( len, ply )
 	local ReWardLevelMutli = net.ReadString()
 	sql.Query( "UPDATE apple_deathmatch_settings SET Value = '"..ReWardLevelMutli.."' WHERE ID = '8' " )
+end)
+
+net.Receive( "f3_menu_apple_setting_killer_preventer", function( len, ply )
+	local SpawnKillersPr = net.ReadString()
+	sql.Query( "UPDATE apple_deathmatch_settings SET Value = '"..SpawnKillersPr.."' WHERE ID = '12' " )
 end)
 
 net.Receive( "f3_menu_apple_setting_intro_song", function( len, ply )
@@ -758,6 +832,7 @@ function GM:ShowSpare1( ply ) -- Launched the F3 Menu
 	end
 end
 util.AddNetworkString( "f3_menu_apple_fill_settings_maps" )
+util.AddNetworkString( "f3_menu_apple_setting_killer_preventer" )
 util.AddNetworkString( "f3_menu_apple_fill_settings" )
 util.AddNetworkString( "f3_menu_apple_setting_time" )
 util.AddNetworkString( "f3_menu_apple_setting_score" )
@@ -766,6 +841,7 @@ util.AddNetworkString( "f3_menu_apple_setting_levelup_song_time" )
 util.AddNetworkString( "f3_menu_apple_setting_levelup_song" )
 util.AddNetworkString( "f3_menu_apple_setting_intro" )
 util.AddNetworkString( "f3_menu_apple_setting_reward_level" )
+util.AddNetworkString( "f3_menu_apple_setting_join_and_play" )
 util.AddNetworkString( "f3_menu_apple_setting_reward_level_multi" )
 util.AddNetworkString( "f3_menu_apple_setting_intro_song_time" )
 util.AddNetworkString( "f3_menu_apple_setting_show_spawns" )

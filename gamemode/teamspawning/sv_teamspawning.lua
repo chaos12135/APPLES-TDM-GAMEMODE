@@ -81,12 +81,44 @@ hook.Add( "PlayerInitialSpawn", "PlayerInitialSpawnTeamSpawning", function(ply)
 end)
 */
 
+function GM:PlayerShouldTakeDamage( Victim, Attacker ) 
+	if Attacker:IsPlayer() == true then
+		if tonumber(Attacker:GetPData("PlayerIsSpawnSafe")) == 1 then
+			Attacker:GodDisable()
+			Attacker:SetHealth(100)
+			Attacker:SetPData("PlayerIsSpawnSafe", 0)
+			Attacker:SetColor( Color( 255, 255, 255, 255 ) )
+			Attacker:SetRenderMode( RENDERMODE_TRANSALPHA )
+			umsg.Start( "PlayerIsSpawnSafeA" )
+				umsg.Entity(Attacker)
+				umsg.Short(tonumber(0))
+			umsg.End()
+			timer.Destroy("PlayerKillerColor_"..Attacker:UniqueID())
+			return false
+		else
+			return true
+		end
+	else
+		return true
+	end
+end
+
+net.Receive( "PlayerIsSpawnSafeFix", function( len, ply )
+	for k, v in pairs(player.GetAll()) do
+		umsg.Start( "PlayerIsSpawnSafeA" )
+			umsg.Entity(v)
+			umsg.Short(tonumber(v:GetPData("PlayerIsSpawnSafe")))
+		umsg.End()
+	end
+end)
+
 
 function GM:PlayerSpawn(ply)
 if THEGAMEISOVERDONOTFIREANYMORE == 1 then 
 	
 return end
 
+	local BlinkingPlayer = 1
 	if ply:Team() < 1000 && ply:Team() > 0 then
 	ply:StripWeapons()
 	ply:StripAmmo()
@@ -94,6 +126,7 @@ return end
 		local NewTeamName_sv_teamspawning = string.gsub(team.GetName(ply:Team()), " ", "_")
 		local NewTeamName_sv_teamspawning = sql.SQLStr("apple_deathmatch_"..game.GetMap().."_teamspawning_"..NewTeamName_sv_teamspawning)
 		local NewTeamName_sv_teamspawning = string.gsub(NewTeamName_sv_teamspawning, "'", "")
+		local SpawnKillerPrevention_sv_teamspawning = sql.QueryValue( "SELECT Value from apple_deathmatch_settings WHERE ID = '12';" )
 		if sql.TableExists(NewTeamName_sv_teamspawning) == true then
 			local TeamSpawnsF = sql.Query( "SELECT * FROM "..NewTeamName_sv_teamspawning.."" )
 			local TeamSpawnsC = sql.QueryValue( "SELECT COUNT(ID) from "..NewTeamName_sv_teamspawning..";" )
@@ -103,6 +136,33 @@ return end
 				if tonumber(v['ID']) == tonumber(SelectedSpawn) then
 					ply:SetPos(Vector(v['X'],v['Y'],v['Z']))
 					ply:SetEyeAngles(Angle(""..v['Roll'].." "..v['Yaw'].." "..v['Pitch']..""))
+					if tonumber(SpawnKillerPrevention_sv_teamspawning) == 1 then
+					ply:GodEnable()
+					ply:SetPData("PlayerIsSpawnSafe", 1)
+					umsg.Start( "PlayerIsSpawnSafeA" )
+						umsg.Entity(ply)
+						umsg.Short(tonumber(1))
+					umsg.End()
+						timer.Create( "PlayerKillerColor_"..ply:UniqueID(), 0.3, 10, function()
+							if BlinkingPlayer == 1 then
+								BlinkingPlayer = 0
+								ply:SetColor( Color( 255, 255, 255, 0 ) )
+								ply:SetRenderMode( RENDERMODE_TRANSALPHA )
+							else
+								BlinkingPlayer = 1
+								ply:SetColor( Color( 255, 255, 255, 255 ) )
+								ply:SetRenderMode( RENDERMODE_TRANSALPHA )
+							end
+						end )
+						timer.Simple( 3.1, function()
+							ply:GodDisable()
+							ply:SetPData("PlayerIsSpawnSafe", 0)
+							umsg.Start( "PlayerIsSpawnSafeA" )
+								umsg.Entity(ply)
+								umsg.Short(tonumber(0))
+							umsg.End()
+						end )
+					end
 				end
 			end
 		end
