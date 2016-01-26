@@ -27,28 +27,31 @@ net.Receive( "adci_add_new_team", function( len, ply )
 		if sql.LastError() != nil then
 			 -- MsgN("sv_createteam.lua: "..sql.LastError())
 		end
-		CreateNewTeamWeaponDB()
-		CreateNewTeamSpawningDB()
-		CreateNewTeamModelsDB()
-		CreateTeamsForServer()
 		
-		local NewTeamName_sv_teammodels = string.gsub(tostring(TeamName), " ", "_")
-		local NewTeamName_sv_teammodels = sql.SQLStr("apple_deathmatch_teammodels_"..NewTeamName_sv_teammodels)
-		local NewTeamName_sv_teammodels = string.gsub(NewTeamName_sv_teammodels, "'", "")
-		for k, v in pairs(TeamModel) do
-			GetTheTotalNumberofWeaponsForListing = GetTheTotalNumberofWeaponsForListing + 1
-			sql.Query( "INSERT INTO "..NewTeamName_sv_teammodels.." (`ID`, `ModelName`, `ModelDir`) VALUES ('"..tonumber(GetTheTotalNumberofWeaponsForListing).."', '"..tostring(k).."', '"..tostring(v).."')" )
-		if sql.LastError() != nil then
-			 -- MsgN("sv_createteam.lua: "..sql.LastError())
-		end
-		end
+		timer.Simple(0.25, function()
+			CreateNewTeamWeaponDB()
+			CreateNewTeamSpawningDB()
+			CreateNewTeamModelsDB()
+			CreateTeamsForServer()
+			
+			local NewTeamName_sv_teammodels = string.gsub(tostring(TeamName), " ", "_")
+			local NewTeamName_sv_teammodels = sql.SQLStr("apple_deathmatch_teammodels_"..NewTeamName_sv_teammodels)
+			local NewTeamName_sv_teammodels = string.gsub(NewTeamName_sv_teammodels, "'", "")
+			for k, v in pairs(TeamModel) do
+				GetTheTotalNumberofWeaponsForListing = GetTheTotalNumberofWeaponsForListing + 1
+				sql.Query( "INSERT INTO "..NewTeamName_sv_teammodels.." (`ID`, `ModelName`, `ModelDir`) VALUES ('"..tonumber(GetTheTotalNumberofWeaponsForListing).."', '"..tostring(k).."', '"..tostring(v).."')" )
+			if sql.LastError() != nil then
+				 -- MsgN("sv_createteam.lua: "..sql.LastError())
+			end
+			end
+			
+			for k, v in pairs(player.GetAll()) do
+				PlayerInitialSpawnTeams(v)
+			end
 		
-		for k, v in pairs(player.GetAll()) do
-			PlayerInitialSpawnTeams(v)
-		end
-		
-		umsg.Start( "creating_teams_not_error", ply )
-		umsg.End()
+			umsg.Start( "creating_teams_not_error", ply )
+			umsg.End()
+		end)
 	else
 		umsg.Start( "creating_teams_error", ply )
 		umsg.End()
@@ -191,10 +194,15 @@ net.Receive( "adci_edit_team", function( len, ply )
 				if sql.TableExists(NewTeamName_sv_teamweapons2) == false then
 					sql.Query( "ALTER TABLE "..NewTeamName_sv_teamweapons.." RENAME TO "..NewTeamName_sv_teamweapons2.."" )
 					if sql.LastError() != nil then
-						 -- MsgN("sv_createteam.lua: "..sql.LastError())
+					--	MsgN("sv_createteam.lua: "..sql.LastError())
 					end
 				end
 			end
+			if tostring(TeamName) == tostring(sql.QueryValue( "SELECT TeamName from apple_deathmatch_team WHERE TeamName = '"..tostring(TeamName).."';" )) then 
+				umsg.Start( "creating_teams_error", ply )
+				umsg.End()
+			return end
+		end
 		
 			
 			local NewTeamName_sv_teammodels = string.gsub(tostring(OldTeamName), " ", "_")
@@ -203,6 +211,7 @@ net.Receive( "adci_edit_team", function( len, ply )
 			local NewTeamName_sv_teammodels2 = string.gsub(tostring(TeamName), " ", "_")
 			local NewTeamName_sv_teammodels2 = sql.SQLStr("apple_deathmatch_teammodels_"..NewTeamName_sv_teammodels2)
 			local NewTeamName_sv_teammodels2 = string.gsub(NewTeamName_sv_teammodels2, "'", "")
+			--MsgN(sql.TableExists(NewTeamName_sv_teammodels))
 			if sql.TableExists(NewTeamName_sv_teammodels) == true then
 			local GatherAllModels = sql.Query( "SELECT * FROM "..NewTeamName_sv_teammodels.." ORDER BY ID DESC" )
 				
@@ -217,13 +226,15 @@ net.Receive( "adci_edit_team", function( len, ply )
 					end
 				end	
 				
+				--MsgN("NIGGA")
+				--PrintTable(TeamModelTable)
 				
 				for k, v in pairs(TeamModelTable) do
 					if tostring(v) != "nil" then
 					GetTheTotalNumberofWeaponsForListing = GetTheTotalNumberofWeaponsForListing + 1
 						sql.Query( "INSERT INTO "..NewTeamName_sv_teammodels.." (`ID`, `ModelName`, `ModelDir`) VALUES ('"..tonumber(GetTheTotalNumberofWeaponsForListing).."', '"..tostring(k).."', '"..tostring(v).."')" )
 						if sql.LastError() != nil then
-							 -- MsgN("sv_createteam.lua: "..sql.LastError())
+							 -- MsgN("sv_createteam.lua 229: "..sql.LastError())
 						end
 					end
 				end
@@ -236,12 +247,6 @@ net.Receive( "adci_edit_team", function( len, ply )
 					end
 				end
 			end
-			
-			if tostring(TeamName) == tostring(sql.QueryValue( "SELECT TeamName from apple_deathmatch_team WHERE TeamName = '"..tostring(TeamName).."';" )) then 
-				umsg.Start( "creating_teams_error", ply )
-				umsg.End()
-			return end
-		end
 		
 		umsg.Start( "creating_teams_not_error", ply )
 		umsg.End()

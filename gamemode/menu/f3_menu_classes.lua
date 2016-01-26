@@ -403,7 +403,7 @@ function CreateNewClassWeaponDB()
 	local NewClassName_sv_Classweapons = sql.SQLStr("apple_deathmatch_classes_"..NewClassName_sv_Classweapons)
 	local NewClassName_sv_Classweapons = string.gsub(NewClassName_sv_Classweapons, "'", "") 
 			
-		if sql.TableExists(NewClassName_sv_Classweapons) == false then
+		if sql.TableExists("'"..NewClassName_sv_Classweapons.."'") == false then
 			sql.Query( "CREATE TABLE "..NewClassName_sv_Classweapons.." ( ID int, Nice varchar(255), Name varchar(255))" )
 			if sql.LastError() != nil then
 				 -- MsgN("sv_teamweapons.lua: "..sql.LastError())
@@ -428,7 +428,7 @@ function CreateNewClassWeaponDBFirst()
 	local NewClassName_sv_Classweapons = sql.SQLStr("apple_deathmatch_classes_"..NewClassName_sv_Classweapons)
 	local NewClassName_sv_Classweapons = string.gsub(NewClassName_sv_Classweapons, "'", "") 
 			
-		if sql.TableExists(NewClassName_sv_Classweapons) == false then
+		if sql.TableExists("'"..NewClassName_sv_Classweapons.."'") == false then
 			sql.Query( "CREATE TABLE "..NewClassName_sv_Classweapons.." ( ID int, Nice varchar(255), Name varchar(255))" )
 			-- MsgN("Creating team weapons table for: "..v['TeamName'])
 		end

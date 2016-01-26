@@ -20,7 +20,7 @@ function CreateNewTeamLogsDB()
 	local NewTeamName_sv_teamlogs = sql.SQLStr("apple_deathmatch_teamlogs_"..NewTeamName_sv_teamlogs)
 	local NewTeamName_sv_teamlogs = string.gsub(NewTeamName_sv_teamlogs, "'", "") 
 			
-		if sql.TableExists(NewTeamName_sv_teamlogs) == false then
+		if sql.TableExists("'"..NewTeamName_sv_teamlogs.."'") == false then
 			sql.Query( "CREATE TABLE "..NewTeamName_sv_teamlogs.." ( ID int, Date varchar(255), Change varchar(255), Name varchar(255), SteamID varchar(255))" )
 			if sql.LastError() != nil then
 				 -- MsgN("sv_teamweapons.lua: "..sql.LastError())
