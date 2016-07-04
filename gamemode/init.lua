@@ -23,6 +23,7 @@ AddCSLuaFile( 'menu/f3_menu_shop.lua' )
 AddCSLuaFile( 'menu/f4_menu.lua' )
 AddCSLuaFile( 'menu/classes_menu.lua' )
 AddCSLuaFile( 'menu/cl_adci_teams.lua' )
+AddCSLuaFile( 'scoreboard_tab/cl_tab.lua' )
 AddCSLuaFile( 'hud/cl_apple_hud.lua' )
 AddCSLuaFile( 'hud/cl_apple_hud_fonts.lua' )
 AddCSLuaFile( "shared.lua" )
@@ -42,6 +43,7 @@ include( 'menu/f3_menu_shop.lua' )
 include( 'menu/f4_menu.lua' )
 include( 'menu/classes_menu.lua' )
 include( 'hud/sv_apple_hud.lua' )
+include( 'scoreboard_tab/sv_tab.lua' )
 include( 'teamspawning/sv_teamspawning.lua' )
 include( 'teamweapons/sv_teamweapons.lua' )
 include( 'teammodels/sv_teammodels.lua' )
@@ -323,22 +325,25 @@ local CheckGameTimeTeamInfo = sql.QueryValue( "SELECT COUNT(ID) from apple_death
 	end
 	
 	if PlayerCounterAll <= 1 then -- Checks to see if no players are on, then just place the first guy on a random team
+		MsgN("Player has joined while no other players were online, placing player anywhere")
 		GAMEMODE:PlayerSpawnAsSpectator( ply )
 		ply:SetTeam(math.random( 1, CheckGameTimeTeamInfo )) -- Just find a random team to be apart of
 		ClassesSystemActivated( ply )
 	elseif PlayerCounterAll == 2 then -- If one person is on, and you're going to be the second person, then place you on another team other than the first guy
+		MsgN("Player has joined while minimum and maximum of 1 player is online, will now be placing this player on any random team other then the first player")
 		GAMEMODE:PlayerSpawnAsSpectator( ply )
 		PlaceSecondPlayerOnTeam(ply)
 		ClassesSystemActivated( ply )
 	elseif GlobalizationStartTimerForGamemodeApple == 1 && tonumber(sql.QueryValue( "SELECT Value from apple_deathmatch_settings WHERE ID = '14';" )) == 0 then -- The game has started, so place spectator mode, and find a player to spectate
-		MsgN("Player has joined during game, but is NOT allowed to play due to setting")
+		MsgN("Player has joined during game, but is NOT allowed to play due F3 menu setting")
 		GAMEMODE:PlayerSpawnAsSpectator( ply )
 		YouChooseMeToSpectate(ply) -- This chooses a players to spectate, and also makes sure it's not the player himself
 	elseif GlobalizationStartTimerForGamemodeApple == 1 && tonumber(sql.QueryValue( "SELECT Value from apple_deathmatch_settings WHERE ID = '14';" )) == 1 then
-		MsgN("Player has joined during game, but is allowed to play due to setting")
+		MsgN("Player has joined during game, but is allowed to play due to F3 menu setting")
 		PlaceMeOnTheLowestTeamAvaialable(ply)
 		ClassesSystemActivated( ply )
 		timer.Simple(1, function()
+			ply:UnSpectate()
 			ply:StripWeapons()
 			ply:StripAmmo()
 			ply:Spawn()
@@ -348,6 +353,7 @@ local CheckGameTimeTeamInfo = sql.QueryValue( "SELECT COUNT(ID) from apple_death
 			umsg.End()
 		end)
 	else
+		MsgN("Player has joined before game has started and there are at least two players online already, placing on spectator team and selecting a team")
 		GAMEMODE:PlayerSpawnAsSpectator( ply ) -- This is for if the game hasn't started, and there are more than two players
 		PlaceMeOnTheLowestTeamAvaialable( ply ) -- This places the person on the next following team with the lowest number of people on it
 		ClassesSystemActivated( ply )
@@ -460,6 +466,33 @@ function CheckPlayerDatabase( ply )
 		umsg.Short(sql.QueryValue( "SELECT Score FROM apple_deathmatch_player_103 WHERE SteamID = '"..tostring(ply:UniqueID()).."';" ))
 	umsg.End()
 end
+
+/*
+function ScoreboardHUD(ply)
+	timer.Simple(1, function()
+		for k, v in pairs(player.GetAll()) do
+		if v == nil || ply == nil then 
+		MsgN("Returned")
+		return end
+			if ply == v then
+				MsgN("1")
+				net.Start( "SCOREBOARD_GET_POINTS" )
+					net.WriteEntity( v )
+					net.WriteString( sql.QueryValue( "SELECT Score FROM apple_deathmatch_player_103 WHERE SteamID = '"..tostring(v:UniqueID()).."';" ) )
+				net.Send(ply)
+			else
+				MsgN("2")
+				net.Start( "SCOREBOARD_GET_POINTS" )
+					net.WriteEntity( ply )
+					net.WriteString( sql.QueryValue( "SELECT Score FROM apple_deathmatch_player_103 WHERE SteamID = '"..tostring(ply:UniqueID()).."';" ) )
+				net.Send(v)
+			end
+		end
+	end)
+end
+hook.Add("PlayerSpawn", "PlayerSpawnScoreboardHUD", ScoreboardHUD)
+*/
+--hook.Add("PlayerDisconnected", "PlayerDisconnectedScoreboardHUD", ScoreboardHUD)
 
 
 -- Check to see if the players table exists
@@ -620,6 +653,30 @@ local AttackerInfo = sql.Query( "SELECT * from apple_deathmatch_player_103 WHERE
 			umsg.Entity(attacker:GetActiveWeapon())
 			umsg.Entity(attacker)
 		umsg.End()
+		
+/*
+	--timer.Simple(0.5, function()
+		for k, v in pairs(player.GetAll()) do
+		
+		if v == nil || ply == nil then 
+		MsgN("Returned")
+		return end
+		--	if attacker == v then
+				MsgN("1")
+				net.Start( "SCOREBOARD_GET_POINTS" )
+					net.WriteEntity( v )
+					net.WriteString( sql.QueryValue( "SELECT Score FROM apple_deathmatch_player_103 WHERE SteamID = '"..tostring(v:UniqueID()).."';" ) )
+				net.Send(attacker)
+		--	else
+		--		MsgN("2")
+		--		net.Start( "SCOREBOARD_GET_POINTS" )
+		--			net.WriteEntity( attacker )
+		--			net.WriteString( sql.QueryValue( "SELECT Score FROM apple_deathmatch_player_103 WHERE SteamID = '"..tostring(attacker:UniqueID()).."';" ) )
+		--		net.Send(v)
+		--	end
+		end
+	--end)
+*/
 	return end
 end
 
@@ -798,4 +855,6 @@ end
 
 util.AddNetworkString( "f3_apple_setting_reward_c" )
 util.AddNetworkString( "GetNiceNameofWeapon" )
+util.AddNetworkString( "SCOREBOARD_GET_POINTS" )
+util.AddNetworkString( "SCOREBOARD_GET_POINTS2" )
 util.AddNetworkString( "PlayerIsSpawnSafeFix" )
