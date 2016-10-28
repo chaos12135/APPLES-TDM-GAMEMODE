@@ -9,7 +9,7 @@
 
 
 -- General Gamemode Information
-GM.Name 	= "Apple's TDM 1.41" --Set the gamemode name
+GM.Name 	= "Apple's TDM 1.42" --Set the gamemode name
 GM.Author 	= "Dr. Apple" --Set the author name
 GM.Email 	= "gaben@valvesoftware.com" --Set the author email
 GM.Website 	= "http://valvesoftware.com" --Set the author website
