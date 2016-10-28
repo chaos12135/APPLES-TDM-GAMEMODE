@@ -5,7 +5,14 @@ if CLIENT then
 	local PlayerKills = data:ReadShort()
 	local PlayerDeaths = data:ReadShort()
 	local PlayerScore = data:ReadShort()
-	local PlayerRatio = tonumber(string.format("%.2f",data:ReadString()))
+	local PlayerRatio = data:ReadString()
+		if (PlayerRatio == "inf") then
+			if(PlayerKills == 0) then
+				PlayerRatio = (PlayerDeaths*-1)
+			else
+				PlayerRatio = PlayerKills
+			end
+		end
 	local FavGunNiceName = data:ReadString()
 	local FavGunName = data:ReadString()
 	local FavGunKills = data:ReadShort()
@@ -339,39 +346,39 @@ if SERVER then
 	end)
 
 	function GM:ShowHelp( ply ) -- This hook is called every time F1 is pressed.
-	local PlayerInfo = sql.Query( "SELECT * from apple_deathmatch_player_103 WHERE SteamID = '"..tostring(ply:UniqueID()).."';" )
-	if PlayerInfo == nil then return end
-	for k, v in pairs(PlayerInfo) do
-		f1_PlayerKills = v['Kills']
-		f1_PlayerDeaths = v['Deaths']
-		f1_PlayerScore = v['Score']
-		f1_PlayerRatio = v['Ratio']
-		f1_PlayerJoin = v['cont']
-		f1_PlayerDisc = v['dsc']
-	end
-	local GunInfo = sql.Query( "SELECT * from apple_deathmatch_fav_gun"..tostring(ply:UniqueID()).." ORDER BY Kills DESC LIMIT 1;" )
-	if GunInfo != nil then
-		for k, v in pairs(GunInfo) do
-			f1_GunNiceName = v['weapon_name_nice']
-			f1_GunName = v['weapon_name']
-			f1_GunKills = v['Kills']
+		local PlayerInfo = sql.Query( "SELECT * from apple_deathmatch_player_103 WHERE SteamID = '"..tostring(ply:UniqueID()).."';" )
+		if PlayerInfo == nil then return end
+		for k, v in pairs(PlayerInfo) do
+			f1_PlayerKills = v['Kills']
+			f1_PlayerDeaths = v['Deaths']
+			f1_PlayerScore = v['Score']
+			f1_PlayerRatio = v['Ratio']
+			f1_PlayerJoin = v['cont']
+			f1_PlayerDisc = v['dsc']
 		end
-	else
-		f1_GunNiceName = "N/A"
-		f1_GunName = "weapon_medkit"
-		f1_GunKills = "No Kills"
-	end
-		umsg.Start( "f1_menu_apple", ply )
-			umsg.Short(f1_PlayerKills)
-			umsg.Short(f1_PlayerDeaths)
-			umsg.Short(f1_PlayerScore)
-			umsg.String(f1_PlayerRatio)
-			umsg.String(f1_GunNiceName)
-			umsg.String(f1_GunName)
-			umsg.Short(f1_GunKills)
-			umsg.Short(f1_PlayerJoin)
-			umsg.Short(f1_PlayerDisc)
-		umsg.End()
+		local GunInfo = sql.Query( "SELECT * from apple_deathmatch_fav_gun"..tostring(ply:UniqueID()).." ORDER BY Kills DESC LIMIT 1;" )
+		if GunInfo != nil then
+			for k, v in pairs(GunInfo) do
+				f1_GunNiceName = v['weapon_name_nice']
+				f1_GunName = v['weapon_name']
+				f1_GunKills = v['Kills']
+			end
+		else
+			f1_GunNiceName = "N/A"
+			f1_GunName = "weapon_medkit"
+			f1_GunKills = "No Kills"
+		end
+			umsg.Start( "f1_menu_apple", ply )
+				umsg.Short(f1_PlayerKills)
+				umsg.Short(f1_PlayerDeaths)
+				umsg.Short(f1_PlayerScore)
+				umsg.String(f1_PlayerRatio)
+				umsg.String(f1_GunNiceName)
+				umsg.String(f1_GunName)
+				umsg.Short(f1_GunKills)
+				umsg.Short(f1_PlayerJoin)
+				umsg.Short(f1_PlayerDisc)
+			umsg.End()
 	end
 util.AddNetworkString( "f1_menu_apple_class_list" )
 util.AddNetworkString( "f1_menu_apple_class_list22" )
